@@ -10,6 +10,7 @@ from django.utils.encoding import smart_str
 from mido import MidiFile, MidiTrack, Message
 import os
 from django.core.files.storage import default_storage
+from music21 import *
 
 
 
@@ -35,6 +36,12 @@ def int_to_index(note_num):
     letters = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
     noteIndex = ((note_num+3) % 12)
     return noteIndex
+
+def int_to_String(note_num):
+    letters = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
+    noteIndex = ((note_num+3) % 12)
+    note = letters[noteIndex] + str((note_num+3) // 12 - 1) 
+    return note
 ml_arr = [[0,0,1,0,0,0,0,0,0,0,0,0,0], [0,1,0,0,0,0,1,0,0,1,0,0,0], [0,0,1,0,0,0,0,0,1,0,0,1,0], [0,1,0,0,0,0,0,0,0,0,0,1,0]]
 
 def arr_to_chord(arr):
@@ -113,6 +120,7 @@ def parse_midi_file(filepath):
     numerator = 4
     denominator = 4
     channels = set()
+    stream = stream.Stream()
     for i, track in enumerate(mid2.tracks):
         print('Track {}: {}'.format(i, track.name))
         print('starrrrt')
@@ -133,8 +141,14 @@ def parse_midi_file(filepath):
                             note.end = time
                             all_notes.append(note)
                             open_notes.pop(index)
+                            stringNote = int_to_String(note.note)
+                            length = (note.end - note.start) / mid2.ticks_per_beat 
+                            note_to_insert = note.Note(stringNote)
+                            note_to_insert.quarterLength = length
+                            stream.append(note_to_insert)
                             break
             time += msg.time
+    print(analysis.discrete.analyzeStream(stream, 'Krumhansl'))
     print(len(all_notes))
     result = []
     curbar = [0,0,0,0,0,0,0,0,0,0,0,0]
