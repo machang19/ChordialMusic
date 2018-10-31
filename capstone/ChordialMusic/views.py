@@ -29,15 +29,15 @@ class Note:
         self.start = start
         self.end = end
     def __str__(self):
-        return ("Note note = %d start = % d end = % d length = %d" %(self.note,self.start,self.end,self.end-self.start) )
+        return ("Note note = %s start = % d end = % d length = %d" %(noteNumToString(self.note),self.start,self.end,self.end-self.start) )
 
 
-def int_to_index(note_num):
+def noteNumToindex(note_num):
     letters = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
     noteIndex = ((note_num+3) % 12)
     return noteIndex
 
-def int_to_String(note_num):
+def noteNumToString(note_num):
     letters = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
     noteIndex = ((note_num+3) % 12)
     note = letters[noteIndex] + str((note_num+3) // 12 - 1) 
@@ -71,6 +71,7 @@ def output_to_midi(ml_arr, mid, barlength, channels):
         print('Track {}: {}'.format(i, track.name))
         print('starrrrt')
         for msg in t:
+            time += msg.time
             if not msg.is_meta:
                 if (firstMessage):
                     firstMessage = False
@@ -78,11 +79,9 @@ def output_to_midi(ml_arr, mid, barlength, channels):
                         track.append(Message('note_on', channel=channel, note=note, time=0))
                     track.append(msg)
                     continue
-            prevTime = time
-            time += msg.time
+
             if (index < len(ml_arr)):
                 if (time > nextBarStart):
-                    msg.time = nextBarStart - prevTime
                     track.append(msg)
                     msgs_to_add = []
                     for note in arr_to_chord(ml_arr[index]):
@@ -91,7 +90,6 @@ def output_to_midi(ml_arr, mid, barlength, channels):
                     if (index < len(ml_arr)):
                         for note in arr_to_chord(ml_arr[index]):
                             msgs_to_add.append(Message('note_on', channel=channel, note=note, time = 0))
-                    msgs_to_add[-1].time = time - nextBarStart
                     for m in msgs_to_add:
                         track.append(m)
                     nextBarStart += barlength
@@ -120,12 +118,13 @@ def parse_midi_file(filepath):
     numerator = 4
     denominator = 4
     channels = set()
-    stream = stream.Stream()
+    stream1 = stream.Stream()
     for i, track in enumerate(mid2.tracks):
         print('Track {}: {}'.format(i, track.name))
         print('starrrrt')
         for msg in track:
             print(msg)
+            time += msg.time
             if (msg.type == 'time_signature'):
                 print("gere")
                 numerator = msg.numerator
@@ -135,52 +134,50 @@ def parse_midi_file(filepath):
                 open_notes.append(Note(msg.note,time, time))
             elif (msg.type == 'note_off' or (msg.type == 'note_on' and msg.velocity == 0)):
                 for index in range(len(open_notes)):
-                    note = open_notes[index]
-                    if(note.note == msg.note):
+                    midi_note = open_notes[index]
+                    if(midi_note.note == msg.note):
                         if (msg.time > 0):
-                            note.end = time
-                            all_notes.append(note)
+                            midi_note.end = time
+                            all_notes.append(midi_note)
                             open_notes.pop(index)
-                            stringNote = int_to_String(note.note)
-                            length = (note.end - note.start) / mid2.ticks_per_beat 
+                            stringNote = noteNumToString(midi_note.note)
+                            length = (midi_note.end - midi_note.start) / mid2.ticks_per_beat
                             note_to_insert = note.Note(stringNote)
                             note_to_insert.quarterLength = length
-                            stream.append(note_to_insert)
+                            stream1.append(note_to_insert)
                             break
-            time += msg.time
-    print(analysis.discrete.analyzeStream(stream, 'Krumhansl'))
+
+    print(analysis.discrete.analyzeStream(stream1, 'Krumhansl').tonicPitchNameWithCase)
     print(len(all_notes))
     result = []
     curbar = [0,0,0,0,0,0,0,0,0,0,0,0]
     time = 0;
     curbarStart = 0;
     bar_length = mid2.ticks_per_beat * numerator
-    for note in all_notes:
-        #print(note)
-        index = int_to_index(note.note)
-        time = note.start
-        if time > (curbarStart + bar_length):
+    print(bar_length)
+    for midi_note in all_notes:
+        print(midi_note)
+        index = noteNumToindex(midi_note.note)
+        time = midi_note.start
+        if time >= (curbarStart + bar_length):
             curbarStart += bar_length
             temp = curbar
             result.append(temp)
             curbar = [0,0,0,0,0,0,0,0,0,0,0,0]
-        curbar[index] += (note.end - note.start)
+        curbar[index] += (midi_note.end - midi_note.start)
+    result.append(curbar)
     for x in result:
-        total = sum(x)
-        if total > 0:
-            correctionFactor = 16/total
-        else:
-            correctionFactor = 1
+        correctionFactor = 16/bar_length
         for i in range(len(x)):
             x[i] = x[i] * correctionFactor
-        #print(x)
+        print(x)
     #print(channels)
     return (result,channels,mid2, bar_length)
 
 
 
 
-parse_midi_file(r'C:\Users\Michael Chang\ChordialMusic\capstone\ChordialMusic\templates\midi\test (2).mid')
+parse_midi_file(r'C:\Users\Michael Chang\ChordialMusic\capstone\ChordialMusic\templates\midi\4_new.mid')
 
 def upload_file(request):
     print("here")
