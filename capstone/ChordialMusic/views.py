@@ -3,10 +3,10 @@ import mimetypes
 import mingus
 from django.http import HttpResponse
 from django.shortcuts import render
-import pygame
 import mido
 # Create your views here.
 from django.utils.encoding import smart_str
+from math import ceil
 from mido import MidiFile, MidiTrack, Message
 import os
 from django.core.files.storage import default_storage
@@ -119,6 +119,7 @@ def parse_midi_file(filepath):
     denominator = 4
     channels = set()
     stream1 = stream.Stream()
+    bar_length = mid2.ticks_per_beat * numerator
     for i, track in enumerate(mid2.tracks):
         print('Track {}: {}'.format(i, track.name))
         print('starrrrt')
@@ -137,7 +138,8 @@ def parse_midi_file(filepath):
                     midi_note = open_notes[index]
                     if(midi_note.note == msg.note):
                         if (msg.time > 0):
-                            midi_note.end = time
+                            midi_end = ceil(time / (bar_length / 16)) * (bar_length / 16)
+                            midi_note.end = midi_end
                             all_notes.append(midi_note)
                             open_notes.pop(index)
                             stringNote = noteNumToString(midi_note.note)
@@ -153,7 +155,7 @@ def parse_midi_file(filepath):
     curbar = [0,0,0,0,0,0,0,0,0,0,0,0]
     time = 0;
     curbarStart = 0;
-    bar_length = mid2.ticks_per_beat * numerator
+
     print(bar_length)
     for midi_note in all_notes:
         print(midi_note)
