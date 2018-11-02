@@ -1,19 +1,66 @@
 
 import mimetypes
 
-import mingus
 import numpy as np
 from django.core.files.storage import default_storage
 from django.http import HttpResponse
 from django.shortcuts import render
 import mido
 # Create your views here.
+# from music21 import *
 from django.utils.encoding import smart_str
 from math import ceil
 from mido import MidiFile, MidiTrack, Message
 import os
-from mlRun import predict
+# from mlRun import predict
 
+import keras.models
+import numpy as np
+
+model_path = "ChordialMusic/mlModels/b128_e50_lstm64_0.3_0.3x2"
+model = keras.models.load_model(model_path)
+model._make_predict_function()
+
+window = 4
+Chords = {0: 'A', 1: 'A#', 2: 'B', 3: 'C', 4: 'C#', 5: 'D', 6: 'D#', 7: 'E', 8: 'F', 9: 'F#', 10: 'G', 11: 'G#', 12: 'Am', 13: 'A#m', 14: 'Bm', 15: 'Cm', 16: 'C#m', 17: 'Dm', 18: 'D#m', 19: 'Em', 20: 'Fm', 21: 'F#m', 22: 'Gm', 23: 'G#m'}
+ChordToNote = {
+    'A':   [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0],
+    'A#':  [0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
+    'B':   [0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0],
+    'C':   [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0],
+    'C#':  [0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1],
+    'D':   [1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0],
+    'D#':  [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0],
+    'E':   [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+    'F':   [1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
+    'F#':  [0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
+    'G':   [0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0],
+    'G#':  [0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1],
+    'Am':  [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0],
+    'A#m': [0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
+    'Bm':  [0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0],
+    'Cm':  [0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0],
+    'C#m': [0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1],
+    'Dm':  [1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
+    'D#m': [0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0],
+    'Em':  [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0],
+    'Fm':  [0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1],
+    'F#m': [1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
+    'Gm':  [0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0],
+    'G#m': [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+}
+
+def predict(inp, numBars):
+    res = []
+    print(inp)
+    pred = model.predict(inp)
+    for x in range(0, numBars):
+        argmax = np.argmax(pred[x], axis = 1)
+        for i, arg in enumerate(argmax):
+            if (x % 2 == 0):
+                res.append(ChordToNote[Chords[arg]])
+                print(Chords[arg])
+    return res
 
 def handle_uploaded_file(f):
     with open(default_storage.path('tmp/'+f.name), 'wb+') as destination:
@@ -21,7 +68,7 @@ def handle_uploaded_file(f):
             destination.write(chunk)
 
     (result, channels, mid2, bar_length, num_bars) = parse_midi_file(default_storage.path('tmp/'+f.name))
-    ml_arr = predict(np.array(result), num_bars)
+    ml_arr = predict(np.array(result), len(result))
     return output_to_midi(ml_arr, mid2, bar_length, channels)
 
 class Note:
@@ -119,7 +166,7 @@ def parse_midi_file(filepath):
     numerator = 4
     denominator = 4
     channels = set()
-    stream1 = stream.Stream()
+    # stream1 = stream.Stream()
     bar_length = mid2.ticks_per_beat * numerator
     for i, track in enumerate(mid2.tracks):
         print('Track {}: {}'.format(i, track.name))
@@ -144,12 +191,12 @@ def parse_midi_file(filepath):
                             open_notes.pop(index)
                             stringNote = noteNumToString(midi_note.note)
                             length = (midi_note.end - midi_note.start) / mid2.ticks_per_beat
-                            note_to_insert = note.Note(stringNote)
-                            note_to_insert.quarterLength = length
-                            stream1.append(note_to_insert)
+                            # note_to_insert = note.Note(stringNote)
+                            # note_to_insert.quarterLength = length
+                            # stream1.append(note_to_insert)
                             break
 
-    print(analysis.discrete.analyzeStream(stream1, 'Krumhansl').tonicPitchNameWithCase)
+    # print(analysis.discrete.analyzeStream(stream1, 'Krumhansl').tonicPitchNameWithCase)
     print(len(all_notes))
     result = []
     curbar = [0,0,0,0,0,0,0,0,0,0,0,0]
@@ -187,7 +234,7 @@ def parse_midi_file(filepath):
 
 
 
-parse_midi_file(r'C:\Users\Michael Chang\ChordialMusic\capstone\ChordialMusic\templates\midi\right3.mid')
+# parse_midi_file(r'C:\Users\Michael Chang\ChordialMusic\capstone\ChordialMusic\templates\midi\right3.mid')
 
 def upload_file(request):
     print("here")
