@@ -1,6 +1,9 @@
+
 import mimetypes
 
 import mingus
+import numpy as np
+from django.core.files.storage import default_storage
 from django.http import HttpResponse
 from django.shortcuts import render
 import mido
@@ -9,9 +12,7 @@ from django.utils.encoding import smart_str
 from math import ceil
 from mido import MidiFile, MidiTrack, Message
 import os
-from django.core.files.storage import default_storage
-from music21 import *
-
+from mlRun import predict
 
 
 def handle_uploaded_file(f):
@@ -19,8 +20,8 @@ def handle_uploaded_file(f):
         for chunk in f.chunks():
             destination.write(chunk)
 
-    (result, channels, mid2, bar_length) = parse_midi_file(default_storage.path('tmp/'+f.name))
-    #os.remove(default_storage.path('tmp/'+f.name))
+    (result, channels, mid2, bar_length, num_bars) = parse_midi_file(default_storage.path('tmp/'+f.name))
+    ml_arr = predict(np.array(result), num_bars)
     return output_to_midi(ml_arr, mid2, bar_length, channels)
 
 class Note:
@@ -182,8 +183,7 @@ def parse_midi_file(filepath):
         fourbar_result.append(result[i:i+window])
         #print(result[i:i+window])
     print(fourbar_result)
-    return (fourbar_result,channels,mid2, bar_length)
-
+    return (fourbar_result,channels,mid2, bar_length, len(result))
 
 
 
