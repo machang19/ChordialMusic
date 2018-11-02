@@ -1,6 +1,9 @@
+
 import mimetypes
 
 import mingus
+import numpy as np
+from django.core.files.storage import default_storage
 from django.http import HttpResponse
 from django.shortcuts import render
 import mido
@@ -9,9 +12,7 @@ from django.utils.encoding import smart_str
 from math import ceil
 from mido import MidiFile, MidiTrack, Message
 import os
-from django.core.files.storage import default_storage
-from music21 import *
-
+from mlRun import predict
 
 
 def handle_uploaded_file(f):
@@ -19,8 +20,8 @@ def handle_uploaded_file(f):
         for chunk in f.chunks():
             destination.write(chunk)
 
-    (result, channels, mid2, bar_length) = parse_midi_file(default_storage.path('tmp/'+f.name))
-    #os.remove(default_storage.path('tmp/'+f.name))
+    (result, channels, mid2, bar_length, num_bars) = parse_midi_file(default_storage.path('tmp/'+f.name))
+    ml_arr = predict(np.array(result), num_bars)
     return output_to_midi(ml_arr, mid2, bar_length, channels)
 
 class Note:
@@ -81,7 +82,7 @@ def output_to_midi(ml_arr, mid, barlength, channels):
                     continue
 
             if (index < len(ml_arr)):
-                if (time > nextBarStart):
+                if (time >= nextBarStart):
                     track.append(msg)
                     msgs_to_add = []
                     for note in arr_to_chord(ml_arr[index]):
@@ -137,7 +138,6 @@ def parse_midi_file(filepath):
                 for index in range(len(open_notes)):
                     midi_note = open_notes[index]
                     if(midi_note.note == msg.note):
-                        if (msg.time > 0):
                             midi_end = ceil(time / (bar_length / 16)) * (bar_length / 16)
                             midi_note.end = midi_end
                             all_notes.append(midi_note)
@@ -168,18 +168,26 @@ def parse_midi_file(filepath):
             curbar = [0,0,0,0,0,0,0,0,0,0,0,0]
         curbar[index] += (midi_note.end - midi_note.start)
     result.append(curbar)
+    count = 0
+    print(numerator)
+    print(denominator)
     for x in result:
-        correctionFactor = 16/bar_length
+        correctionFactor =  16/bar_length
         for i in range(len(x)):
             x[i] = x[i] * correctionFactor
         print(x)
-    #print(channels)
-    return (result,channels,mid2, bar_length)
+    print(" ")
+    window = 4
+    fourbar_result = []
+    for i in range(0, len(result) - window + 1, 2):
+        fourbar_result.append(result[i:i+window])
+        #print(result[i:i+window])
+    print(fourbar_result)
+    return (fourbar_result,channels,mid2, bar_length, len(result))
 
 
 
-
-parse_midi_file(r'C:\Users\Michael Chang\ChordialMusic\capstone\ChordialMusic\templates\midi\4_new.mid')
+parse_midi_file(r'C:\Users\Michael Chang\ChordialMusic\capstone\ChordialMusic\templates\midi\right3.mid')
 
 def upload_file(request):
     print("here")
