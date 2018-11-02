@@ -37,7 +37,7 @@ def predict(inp, numBars):
     res = []
     pred = model.predict(inp)
     # out = np.zeros((len(pred), 4, 24))
-    for x in range(0, numBars/2 - 1):
+    for x in range(0, numBars):
         argmax = np.argmax(pred[x], axis = 1)
         for i, arg in enumerate(argmax):
             if (x % 2 == 0):
