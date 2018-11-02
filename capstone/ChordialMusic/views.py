@@ -81,7 +81,7 @@ def output_to_midi(ml_arr, mid, barlength, channels):
                     continue
 
             if (index < len(ml_arr)):
-                if (time > nextBarStart):
+                if (time >= nextBarStart):
                     track.append(msg)
                     msgs_to_add = []
                     for note in arr_to_chord(ml_arr[index]):
@@ -137,7 +137,6 @@ def parse_midi_file(filepath):
                 for index in range(len(open_notes)):
                     midi_note = open_notes[index]
                     if(midi_note.note == msg.note):
-                        if (msg.time > 0):
                             midi_end = ceil(time / (bar_length / 16)) * (bar_length / 16)
                             midi_note.end = midi_end
                             all_notes.append(midi_note)
@@ -168,18 +167,27 @@ def parse_midi_file(filepath):
             curbar = [0,0,0,0,0,0,0,0,0,0,0,0]
         curbar[index] += (midi_note.end - midi_note.start)
     result.append(curbar)
+    count = 0
+    print(numerator)
+    print(denominator)
     for x in result:
-        correctionFactor = 16/bar_length
+        correctionFactor =  16/bar_length
         for i in range(len(x)):
             x[i] = x[i] * correctionFactor
         print(x)
-    #print(channels)
-    return (result,channels,mid2, bar_length)
+    print(" ")
+    window = 4
+    fourbar_result = []
+    for i in range(0, len(result) - window + 1, 2):
+        fourbar_result.append(result[i:i+window])
+        #print(result[i:i+window])
+    print(fourbar_result)
+    return (fourbar_result,channels,mid2, bar_length)
 
 
 
 
-parse_midi_file(r'C:\Users\Michael Chang\ChordialMusic\capstone\ChordialMusic\templates\midi\4_new.mid')
+parse_midi_file(r'C:\Users\Michael Chang\ChordialMusic\capstone\ChordialMusic\templates\midi\right3.mid')
 
 def upload_file(request):
     print("here")
