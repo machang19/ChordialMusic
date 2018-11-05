@@ -1,4 +1,3 @@
-
 import mimetypes
 
 import numpy as np
@@ -119,6 +118,7 @@ def output_to_midi(ml_arr, mid, barlength, channels):
         print('Track {}: {}'.format(i, track.name))
         print('starrrrt')
         for msg in t:
+            old_time = time
             time += msg.time
             if not msg.is_meta:
                 if (firstMessage):
@@ -130,7 +130,7 @@ def output_to_midi(ml_arr, mid, barlength, channels):
 
             if (index < len(ml_arr)):
                 if (time >= nextBarStart):
-                    track.append(msg)
+
                     msgs_to_add = []
                     for note in arr_to_chord(ml_arr[index]):
                         msgs_to_add.append(Message('note_off',channel=channel, note=note, time=0))
@@ -138,13 +138,20 @@ def output_to_midi(ml_arr, mid, barlength, channels):
                     if (index < len(ml_arr)):
                         for note in arr_to_chord(ml_arr[index]):
                             msgs_to_add.append(Message('note_on', channel=channel, note=note, time = 0))
+                    msgs_to_add[0].time = nextBarStart - old_time
                     for m in msgs_to_add:
                         track.append(m)
+                    msg.time = time - nextBarStart
+                    track.append(msg)
                     nextBarStart += barlength
                 else:
                     track.append(msg)
             else:
                 track.append(msg)
+        m = track.pop(-1)
+        for note in arr_to_chord(ml_arr[index]):
+            track.append(Message('note_off', channel=channel, note=note, time=0))
+        track.append(m)
 
     file_name = "test.mid"
     output_file.save(default_storage.path('tmp/'+file_name))
@@ -270,6 +277,3 @@ def upload_file(request):
         #     # if(msg.type == 'note_on'):
         #     #     print(msg.note)
     return render(request, 'upload.html', {})
-
-
-
