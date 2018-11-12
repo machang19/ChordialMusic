@@ -87,7 +87,7 @@ def noteNumToindex(note_num):
 def noteNumToString(note_num):
     letters = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
     noteIndex = ((note_num+3) % 12)
-    note = letters[noteIndex] + str((note_num+3) // 12 - 1) 
+    note = letters[noteIndex] + str((note_num+3) // 12 - 1)
     return note
 ml_arr = [[0,0,1,0,0,0,0,0,0,0,0,0,0], [0,1,0,0,0,0,1,0,0,1,0,0,0], [0,0,1,0,0,0,0,0,1,0,0,1,0], [0,1,0,0,0,0,0,0,0,0,0,1,0]]
 
@@ -124,6 +124,7 @@ def output_to_midi(ml_arr, mid, barlength, channels):
                 if (firstMessage):
                     firstMessage = False
                     for note in arr_to_chord(ml_arr[index]):
+                        print(Message('note_on', channel=channel, note=note, time=0))
                         track.append(Message('note_on', channel=channel, note=note, time=0))
                     track.append(msg)
                     continue
@@ -138,18 +139,23 @@ def output_to_midi(ml_arr, mid, barlength, channels):
                     if (index < len(ml_arr)):
                         for note in arr_to_chord(ml_arr[index]):
                             msgs_to_add.append(Message('note_on', channel=channel, note=note, time = 0))
+                    print(nextBarStart)
+                    print(old_time)
+                    print(time)
                     msgs_to_add[0].time = nextBarStart - old_time
                     for m in msgs_to_add:
+                        print(m)
                         track.append(m)
                     msg.time = time - nextBarStart
                     track.append(msg)
-                    nextBarStart += barlength
+                    nextBarStart = (time//barlength + 1) * barlength
                 else:
                     track.append(msg)
             else:
                 track.append(msg)
+
         m = track.pop(-1)
-        for note in arr_to_chord(ml_arr[index]):
+        for note in arr_to_chord(ml_arr[-1]):
             track.append(Message('note_off', channel=channel, note=note, time=0))
         track.append(m)
 
@@ -163,6 +169,7 @@ def output_to_midi(ml_arr, mid, barlength, channels):
     response['Content-Disposition'] = "attachment; filename={0}".format(file_name)
     response['Content-Length'] = os.path.getsize(file_full_path)
     return response
+
 
 def parse_midi_file(filepath):
     mid2 = MidiFile(filepath)
