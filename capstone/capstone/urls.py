@@ -17,7 +17,12 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
 import ChordialMusic.views
+from ChordialMusic import views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^$', include('ChordialMusic.urls')),
+    url(r'^chord$', views.get_file, name='chord'),
+    url(r'^download_chord$', views.download_file, name='download'),
+    url(r'^default_path$', views.get_temp_file_path, name='download')
 ]

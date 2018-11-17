@@ -4,6 +4,7 @@ import numpy as np
 from django.core.files.storage import default_storage
 from django.http import HttpResponse
 from django.shortcuts import render
+from datauri import DataURI
 import mido
 # Create your views here.
 # from music21 import *
@@ -13,62 +14,64 @@ from mido import MidiFile, MidiTrack, Message
 import os
 # from mlRun import predict
 
-import keras.models
-import numpy as np
+# import keras.models
+# import numpy as np
+#
+# model_path = "ChordialMusic/mlModels/b128_e50_lstm64_0.3_0.3x2"
+# model = keras.models.load_model(model_path)
+# model._make_predict_function()
+#
+# window = 4
+# Chords = {0: 'A', 1: 'A#', 2: 'B', 3: 'C', 4: 'C#', 5: 'D', 6: 'D#', 7: 'E', 8: 'F', 9: 'F#', 10: 'G', 11: 'G#', 12: 'Am', 13: 'A#m', 14: 'Bm', 15: 'Cm', 16: 'C#m', 17: 'Dm', 18: 'D#m', 19: 'Em', 20: 'Fm', 21: 'F#m', 22: 'Gm', 23: 'G#m'}
+# ChordToNote = {
+#     'A':   [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0],
+#     'A#':  [0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
+#     'B':   [0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0],
+#     'C':   [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0],
+#     'C#':  [0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1],
+#     'D':   [1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0],
+#     'D#':  [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0],
+#     'E':   [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+#     'F':   [1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
+#     'F#':  [0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
+#     'G':   [0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0],
+#     'G#':  [0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1],
+#     'Am':  [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0],
+#     'A#m': [0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
+#     'Bm':  [0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0],
+#     'Cm':  [0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0],
+#     'C#m': [0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1],
+#     'Dm':  [1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
+#     'D#m': [0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0],
+#     'Em':  [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0],
+#     'Fm':  [0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1],
+#     'F#m': [1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
+#     'Gm':  [0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0],
+#     'G#m': [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+# }
+#
+# def predict(inp, numBars):
+#     res = []
+#     print(inp)
+#     pred = model.predict(inp)
+#     for x in range(0, numBars):
+#         argmax = np.argmax(pred[x], axis = 1)
+#         for i, arg in enumerate(argmax):
+#             if (x % 2 == 0):
+#                 res.append(ChordToNote[Chords[arg]])
+#                 print(Chords[arg])
+#     return res
 
-model_path = "ChordialMusic/mlModels/b128_e50_lstm64_0.3_0.3x2"
-model = keras.models.load_model(model_path)
-model._make_predict_function()
-
-window = 4
-Chords = {0: 'A', 1: 'A#', 2: 'B', 3: 'C', 4: 'C#', 5: 'D', 6: 'D#', 7: 'E', 8: 'F', 9: 'F#', 10: 'G', 11: 'G#', 12: 'Am', 13: 'A#m', 14: 'Bm', 15: 'Cm', 16: 'C#m', 17: 'Dm', 18: 'D#m', 19: 'Em', 20: 'Fm', 21: 'F#m', 22: 'Gm', 23: 'G#m'}
-ChordToNote = {
-    'A':   [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0],
-    'A#':  [0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
-    'B':   [0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0],
-    'C':   [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0],
-    'C#':  [0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1],
-    'D':   [1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0],
-    'D#':  [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0],
-    'E':   [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1],
-    'F':   [1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
-    'F#':  [0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-    'G':   [0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0],
-    'G#':  [0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1],
-    'Am':  [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0],
-    'A#m': [0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
-    'Bm':  [0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0],
-    'Cm':  [0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0],
-    'C#m': [0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1],
-    'Dm':  [1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
-    'D#m': [0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0],
-    'Em':  [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0],
-    'Fm':  [0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1],
-    'F#m': [1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-    'Gm':  [0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0],
-    'G#m': [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1]
-}
-
-def predict(inp, numBars):
-    res = []
-    print(inp)
-    pred = model.predict(inp)
-    for x in range(0, numBars):
-        argmax = np.argmax(pred[x], axis = 1)
-        for i, arg in enumerate(argmax):
-            if (x % 2 == 0):
-                res.append(ChordToNote[Chords[arg]])
-                print(Chords[arg])
-    return res
-
-def handle_uploaded_file(f):
+def handle_uploaded_file(request):
+    f = request.FILES["file"]
     with open(default_storage.path('tmp/'+f.name), 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
 
     (result, channels, mid2, bar_length, num_bars) = parse_midi_file(default_storage.path('tmp/'+f.name))
-    ml_arr = predict(np.array(result), len(result))
-    return output_to_midi(ml_arr, mid2, bar_length, channels)
+    # ml_arr = predict(np.array(result), len(result))
+    f_name = output_to_midi(ml_arr, mid2, bar_length, channels)
+    return render(request, 'upload.html', {"id" : f_name, "o_id" : f.name})
 
 class Note:
     def __init__(self, note, start, end):
@@ -89,7 +92,43 @@ def noteNumToString(note_num):
     noteIndex = ((note_num+3) % 12)
     note = letters[noteIndex] + str((note_num+3) // 12 - 1)
     return note
-ml_arr = [[0,0,1,0,0,0,0,0,0,0,0,0,0], [0,1,0,0,0,0,1,0,0,1,0,0,0], [0,0,1,0,0,0,0,0,1,0,0,1,0], [0,1,0,0,0,0,0,0,0,0,0,1,0]]
+ml_arr = [[0,0,1,0,0,0,0,0,0,0,0,0,0], [0,1,0,0,0,0,1,0,0,1,0,0,0], [0,0,1,0,0,0,0,0,1,0,0,1,0], [0,1,0,0,0,0,0,0,0,0,0,1,0],
+          [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
+          [0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+          [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
+          [0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+          [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
+          [0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+          [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
+          [0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+          [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
+          [0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+          [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
+          [0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+          [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
+          [0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+          [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
+          [0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],]
+
+
+def get_file(request):
+    file_name = request.GET["song_id"]
+    file_full_path = default_storage.path('tmp/' + file_name)
+    with open(file_full_path, 'rb+') as f:
+        data = f.read()
+    dataURI = DataURI.from_file(file_full_path)
+    return HttpResponse(dataURI)
+
+def download_file(request):
+    file_name = request.GET["song_id"]
+    file_full_path = default_storage.path('tmp/' + file_name)
+
+    with open(file_full_path, 'rb+') as f:
+        data = f.read()
+    response = HttpResponse(data, content_type=mimetypes.guess_type(file_full_path)[0])
+    response['Content-Disposition'] = "attachment; filename={0}".format(file_name)
+    response['Content-Length'] = os.path.getsize(file_full_path)
+    return response
 
 def arr_to_chord(arr):
     result = []
@@ -130,7 +169,7 @@ def output_to_midi(ml_arr, mid, barlength, channels):
                     continue
 
             if (index < len(ml_arr)):
-                if (time >= nextBarStart):
+                while (time >= nextBarStart):
 
                     msgs_to_add = []
                     for note in arr_to_chord(ml_arr[index]):
@@ -147,10 +186,8 @@ def output_to_midi(ml_arr, mid, barlength, channels):
                         print(m)
                         track.append(m)
                     msg.time = time - nextBarStart
-                    track.append(msg)
-                    nextBarStart = (time//barlength + 1) * barlength
-                else:
-                    track.append(msg)
+                    nextBarStart += barlength
+                track.append(msg)
             else:
                 track.append(msg)
 
@@ -162,13 +199,11 @@ def output_to_midi(ml_arr, mid, barlength, channels):
     file_name = "test.mid"
     output_file.save(default_storage.path('tmp/'+file_name))
     file_full_path = default_storage.path('tmp/'+file_name)
+    return file_name
 
-    with open(file_full_path, 'rb+') as f:
-        data = f.read()
-    response = HttpResponse(data, content_type=mimetypes.guess_type(file_full_path)[0])
-    response['Content-Disposition'] = "attachment; filename={0}".format(file_name)
-    response['Content-Length'] = os.path.getsize(file_full_path)
-    return response
+
+
+
 
 
 def parse_midi_file(filepath):
@@ -222,7 +257,7 @@ def parse_midi_file(filepath):
         print(midi_note)
         index = noteNumToindex(midi_note.note)
         time = midi_note.start
-        if time >= (curbarStart + bar_length):
+        while time >= (curbarStart + bar_length):
             curbarStart += bar_length
             temp = curbar
             result.append(temp)
@@ -246,9 +281,96 @@ def parse_midi_file(filepath):
     print(fourbar_result)
     return (fourbar_result,channels,mid2, bar_length, len(result))
 
+def parse_midi_file_with_chords(filepath):
+    mid2 = MidiFile(filepath)
+    all_notes = []
+    time = 0
+    open_notes = []
+    print(mid2)
+    numerator = 4
+    denominator = 4
+    channels = set()
+    track1Result = []
+    track2Result = []
+    # stream1 = stream.Stream()
+    bar_length = mid2.ticks_per_beat * numerator
+    for i, track in enumerate(mid2.tracks):
+        print('Track {}: {}'.format(i, track.name))
+        print('starrrrt')
+        for msg in track:
+            print(msg)
+            time += msg.time
+            if (msg.type == 'time_signature'):
+                print("gere")
+                numerator = msg.numerator
+                denominator = msg.denominator
+            elif (msg.type == 'note_on' and msg.velocity > 0):
+                channels.add(msg.channel)
+                open_notes.append(Note(msg.note,time, time))
+            elif (msg.type == 'note_off' or (msg.type == 'note_on' and msg.velocity == 0)):
+                for index in range(len(open_notes)):
+                    midi_note = open_notes[index]
+                    if(midi_note.note == msg.note):
+                            midi_end = ceil(time / (bar_length / 16)) * (bar_length / 16)
+                            midi_note.end = midi_end
+                            all_notes.append(midi_note)
+                            open_notes.pop(index)
+                            stringNote = noteNumToString(midi_note.note)
+                            length = (midi_note.end - midi_note.start) / mid2.ticks_per_beat
+                            # note_to_insert = note.Note(stringNote)
+                            # note_to_insert.quarterLength = length
+                            # stream1.append(note_to_insert)
+                            break
+        print(len(all_notes))
+        result = []
+        curbar = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        time = 0;
+        curbarStart = 0;
+
+        print(bar_length)
+        for midi_note in all_notes:
+            print(midi_note)
+            index = noteNumToindex(midi_note.note)
+            time = midi_note.start
+            while time >= (curbarStart + bar_length):
+                curbarStart += bar_length
+                temp = curbar
+                result.append(temp)
+                curbar = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            curbar[index] += (midi_note.end - midi_note.start)
+        result.append(curbar)
+        count = 0
+        print(numerator)
+        print(denominator)
+        for x in result:
+            correctionFactor = 16 / bar_length
+            for i in range(len(x)):
+                x[i] = x[i] * correctionFactor
+            print(x)
+        print(" ")
+        window = 4
+        fourbar_result = []
+        for i in range(0, len(result) - window + 1, 2):
+            fourbar_result.append(result[i:i + window])
+            # print(result[i:i+window])
+        if (track1Result == [] ): track1Result = fourbar_result
+        else: track2Result = fourbar_result
+
+
+    # print(analysis.discrete.analyzeStream(stream1, 'Krumhansl').tonicPitchNameWithCase)
+
+    return (track1Result,track2Result,channels,mid2, bar_length, len(result))
 
 
 # parse_midi_file(r'C:\Users\Michael Chang\ChordialMusic\capstone\ChordialMusic\templates\midi\right3.mid')
+def get_temp_file_path(request):
+    f = request.GET["file"]
+    name = request.GET["name"]
+    print(name)
+    print(f)
+    with open(default_storage.path('tmp/'+name), 'wb+') as destination:
+        destination.write(f.encode())
+    return HttpResponse()
 
 def upload_file(request):
     print("here")
@@ -256,7 +378,7 @@ def upload_file(request):
     print(request.FILES)
     result = []
     if 'file' in request.FILES:
-        return handle_uploaded_file(request.FILES["file"])
+        return handle_uploaded_file(request)
 
         count = 0
         #print(file)

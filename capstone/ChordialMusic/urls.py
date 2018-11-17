@@ -5,5 +5,6 @@ from . import views
 urlpatterns = [
 
     url(r'^$', views.upload_file),
+    url(r'^chord$', views.get_file, name='register'),
 
 ]
