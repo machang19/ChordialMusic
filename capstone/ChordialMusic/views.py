@@ -235,7 +235,7 @@ def parse_midi_file(filepath):
     for midi_note in all_notes:
         index = noteNumToindex(midi_note.note)
         time = midi_note.start
-        if time >= (curbarStart + bar_length):
+        while time >= (curbarStart + bar_length):
             curbarStart += bar_length
             temp = curbar
             result.append(temp)
