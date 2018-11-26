@@ -326,6 +326,7 @@ def parse_midi_file_with_chords(filepath):
             fourbar_result.append(result[i:i + window])
         if (len(track1Result) == 0 ): track1Result = fourbar_result
         else: track2Result = fourbar_result
+        all_notes = [] 
 
 
     # print(analysis.discrete.analyzeStream(stream1, 'Krumhansl').tonicPitchNameWithCase)
