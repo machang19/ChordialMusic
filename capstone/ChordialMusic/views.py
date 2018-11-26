@@ -59,7 +59,7 @@ def predict(inp, numBars, key_fifth):
     res = []
     chords = []
     second = []
-    print(inp)
+    # print(list(inp))
     pred = model.predict(inp)
     for x in range(0, numBars):
         argmax = np.argmax(pred[x], axis = 1)
@@ -81,7 +81,7 @@ def handle_uploaded_file(request):
 
     (result, channels, mid2, bar_length, num_bars, key_fifth) = parse_midi_file(default_storage.path('tmp/'+f.name))
     ml_arr = predict(np.array(result), len(result), key_fifth)
-    f_name = output_to_midi(ml_arr, mid2, bar_length, channels)
+    f_name = output_to_midi(ml_arr, mid2, bar_length, channels, "chords_" + f.name)
     return render(request, 'upload.html', {"id" : f_name, "o_id" : f.name})
 
 class Note:
@@ -131,7 +131,7 @@ def arr_to_chord(arr):
             result.append(57 + i)
     return result
 
-def output_to_midi(ml_arr, mid, barlength, channels):
+def output_to_midi(ml_arr, mid, barlength, channels, file_name):
     channel = 0
     for i in range(15):
         if i not in channels:
@@ -158,34 +158,33 @@ def output_to_midi(ml_arr, mid, barlength, channels):
                     track.append(msg)
                     continue
 
-            if (index < len(ml_arr)):
-                while (time >= nextBarStart):
+            # if (index < len(ml_arr)):
+            while (time >= nextBarStart and index < len(ml_arr)):
 
-                    msgs_to_add = []
+                msgs_to_add = []
+                for note in arr_to_chord(ml_arr[index]):
+                    msgs_to_add.append(Message('note_off',channel=channel, note=note, time=0))
+                index += 1
+                if (index < len(ml_arr)):
                     for note in arr_to_chord(ml_arr[index]):
-                        msgs_to_add.append(Message('note_off',channel=channel, note=note, time=0))
-                    index += 1
-                    if (index < len(ml_arr)):
-                        for note in arr_to_chord(ml_arr[index]):
-                            msgs_to_add.append(Message('note_on', channel=channel, note=note, time = 0))
-                    if (nextBarStart - old_time >= 0 and nextBarStart - old_time < barlength):
-                        msgs_to_add[0].time = nextBarStart - old_time
-                    else:
-                        msgs_to_add[0].time = barlength
-                    for m in msgs_to_add:
-                        track.append(m)
-                    msg.time = time - nextBarStart
-                    nextBarStart += barlength
-                track.append(msg)
-            else:
-                track.append(msg)
+                        msgs_to_add.append(Message('note_on', channel=channel, note=note, time = 0))
+                if (nextBarStart - old_time >= 0 and nextBarStart - old_time < barlength):
+                    msgs_to_add[0].time = nextBarStart - old_time
+                else:
+                    msgs_to_add[0].time = barlength
+                for m in msgs_to_add:
+                    track.append(m)
+                msg.time = time - nextBarStart
+                nextBarStart += barlength
+            track.append(msg)
+            # else:
+            #     track.append(msg)
 
         m = track.pop(-1)
         for note in arr_to_chord(ml_arr[-1]):
             track.append(Message('note_off', channel=channel, note=note, time=0))
         track.append(m)
 
-    file_name = "test.mid"
     output_file.save(default_storage.path('tmp/'+file_name))
     file_full_path = default_storage.path('tmp/'+file_name)
     return file_name
