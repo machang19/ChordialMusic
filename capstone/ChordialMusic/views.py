@@ -3,7 +3,7 @@ import mimetypes
 import numpy as np
 from django.core.files.storage import default_storage
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from datauri import DataURI
 import mido
 from music21 import *
@@ -15,6 +15,8 @@ import os
 
 import keras.models
 import numpy as np
+
+from ChordialMusic.models import ChordProgression
 
 model_path = "ChordialMusic/mlModels/b128_e50_lstm64_0.3_0.3x2"
 model = keras.models.load_model(model_path)
@@ -71,7 +73,7 @@ def predict(inp, numBars, key_fifth):
                 second.append(Chords[transform(arg2, key_fifth)])
     print(chords)
     print(second)
-    return res
+    return res, chords
 
 def handle_uploaded_file(request):
     f = request.FILES["file"]
@@ -80,9 +82,14 @@ def handle_uploaded_file(request):
             destination.write(chunk)
 
     (result, channels, mid2, bar_length, num_bars, key_fifth) = parse_midi_file(default_storage.path('tmp/'+f.name))
-    ml_arr = predict(np.array(result), len(result), key_fifth)
+    ml_arr,chords = predict(np.array(result), len(result), key_fifth)
     f_name = output_to_midi(ml_arr, mid2, bar_length, channels, "chords_" + f.name)
-    return render(request, 'upload.html', {"id" : f_name, "o_id" : f.name})
+    str_chords = ""
+    for c in chords:
+        str_chords += c + " "
+    model = ChordProgression(f.name, str_chords)
+    model.save()
+    return render(request, 'upload.html', {"id": f_name, "o_id": f.name, "pk": model.pk})
 
 class Note:
     def __init__(self, note, start, end):
@@ -188,6 +195,10 @@ def output_to_midi(ml_arr, mid, barlength, channels, file_name):
     output_file.save(default_storage.path('tmp/'+file_name))
     file_full_path = default_storage.path('tmp/'+file_name)
     return file_name
+
+def get_chords(request, id):
+    chords = get_object_or_404(ChordProgression, id=id)
+    return HttpResponse(chords.chords)
 
 def parse_midi_file(filepath):
     mid2 = MidiFile(filepath)
@@ -313,7 +324,7 @@ def parse_midi_file_with_chords(filepath):
         fourbar_result = []
         for i in range(0, len(result) - window + 1, 2):
             fourbar_result.append(result[i:i + window])
-        if (track1Result == [] ): track1Result = fourbar_result
+        if (len(track1Result) == 0 ): track1Result = fourbar_result
         else: track2Result = fourbar_result
 
 
