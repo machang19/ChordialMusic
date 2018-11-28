@@ -11,12 +11,13 @@ var changeTempo1 = function(tempo) {
 
 var play1 = function() {
 	Player1.play();
-	$('#play-button-chord1').children('img').attr('src') = "{% static 'ChordialMusic/assets/pause.png' %}"
+    console.log("hh")
+	$('#play-button-chord1').children('img').attr('src', "{% static 'assets/pause.png' %}");
 }
 
 var pause1 = function() {
 	Player1.pause();
-    $('#play-button-chord1').children('img').attr('src') = "{% static 'ChordialMusic/assets/play.png' %}"
+    $('#play-button-chord1').children('img').attr('src', "{% static 'assets/play.png' %}");
 }
 
 var stop1 = function() {
@@ -161,7 +162,7 @@ Soundfont.instrument(ac, 'https://raw.githubusercontent.com/gleitz/midi-js-sound
 			document.getElementById('file-format-display-chord1').innerHTML = Player1.format;
 			document.getElementById('play-bar-chord1').style.width = 100 - Player1.getSongPercentRemaining() + '%';
             
-            var chord_list = ["C", "Em", "F", "G", "C", "Em", "F", "G", "Em", "Am"];
+            var chord_list = ["C", "Em", "F", "G", "C", "Em", "F", "G", "Em", "Am", "C", "Em", "F", "G", "C", "Em", "F", "G", "Em", "Am", "C", "Em", "F", "G", "C", "Em", "F", "G", "Em", "Am", "C", "Em", "F", "G", "C", "Em", "F", "G", "Em", "Am"];
             var num_display = 9;
             var current_percentage = 100 - Player1.getSongPercentRemaining();
             var interval = 100 / chord_list.length;

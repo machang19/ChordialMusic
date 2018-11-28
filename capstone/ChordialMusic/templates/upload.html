@@ -131,7 +131,7 @@
 			}
 
 			.play_btn {
-				padding-left: 43%;
+				margin-left: 43%;
 			}
 
 
@@ -182,7 +182,7 @@
 
 					<div class="player_block">
 						<div class = "title_div">
-							<img class="icon" src="{% static 'ChordialMusic/assets/computer@2x.png' %}">
+							<img class="icon" src="{% static 'assets/computer@2x.png' %}">
 							<h1 class="block_title">Chord Progression 1 </h1>
 						</div>
 						<!--
@@ -194,17 +194,21 @@
 						</form>
 						-->
 
+						<!-- Lond song button -->
 						<button class="button" onclick="getChordFile()" >Load Songs to Player</button>
 						<p id="loading-chord1">Loading soundfont...</p>
 
+						<!-- Rolling chords -->
 						<div class="chords_display">
 							<p class="chords" id="generated_chords_1"></p>
 						</div>
 
+						<!-- Progress bar -->
 						<div class="progress_bar">
 							<div class="progress_bar_fill" id="play-bar-chord1"></div>
 						</div>
 
+						<!-- Download -->
 						<form method="get" action="download_chord" enctype="multipart/form-data">
     						<input type="hidden" id ="song_id" onchange="getChordFile()" name="song_id" value="{{id}}">
 							<input type="hidden" id ="original_song_id" onchange="getChordFile()" name="o_id" value="{{o_id}}">
@@ -212,12 +216,13 @@
 							<input type="submit" value="Dowload">
 						</form>
 
+						<!-- play & stop buttons -->
 						<div>
 							<button class="button music_btn play_btn" id="play-button-chord1" onclick="Player1.isPlaying() ? pause1() : play1();" disabled="disabled">
-								<img class="music_icon" src="{% static 'ChordialMusic/assets/pause.png' %}">
+								<img class="music_icon" src="{% static 'assets/pause.png' %}">
 							</button>
 							<button class="button music_btn stop_btn" onclick="stop1()">
-								<img class="music_icon" src="{% static 'ChordialMusic/assets/stop.png' %}">
+								<img class="music_icon" src="{% static 'assets/stop.png' %}">
 							</button>
 						</div>
 
