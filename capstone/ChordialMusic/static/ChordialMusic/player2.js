@@ -160,6 +160,31 @@ Soundfont.instrument(ac, 'https://raw.githubusercontent.com/gleitz/midi-js-sound
 			document.getElementById('tempo-display-chord1').innerHTML = Player1.tempo;
 			document.getElementById('file-format-display-chord1').innerHTML = Player1.format;
 			document.getElementById('play-bar-chord1').style.width = 100 - Player1.getSongPercentRemaining() + '%';
+            
+            var chord_list = ["C", "Em", "F", "G", "C", "Em", "F", "G", "Em", "Am"];
+            var num_display = 9;
+            var current_percentage = 100 - Player1.getSongPercentRemaining();
+            var interval = 100 / chord_list.length;
+            var current_index = Math.floor(current_percentage/interval);
+            var start_index = 0
+            var end_index = chord_list.length-1; 
+            var half_num = (num_display-1)/2
+            var output = ""
+
+            if (current_index > half_num) {
+                start_index = current_index - half_num;
+            }
+            if (current_index < (chord_list.length-half_num )) {
+                end_index = current_index + half_num
+            }
+            for (i = start_index; i < end_index + 1; i++) {
+                opacity = 1- Math.abs(i - current_index) / half_num;
+                output = output + "<span style='opacity: " + opacity + "'>" + chord_list[i] + "</span>" + "\t"
+            }
+
+            $('#generated_chords_1').html(output)
+
+
 		});
 		console.log(dataUri);
 		Player1.loadDataUri(dataUri);
