@@ -14,18 +14,141 @@
             integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
             crossorigin="anonymous"></script>
 		<link href="https://fonts.googleapis.com/css?family=Bree+Serif" rel="stylesheet">
+		<script src="{% static 'ChordialMusic/midiplayer.min.js' %}"></script>
+		<script src="{% static 'ChordialMusic/soundfont-player.min.js' %}"></script>
+		<script src="{% static 'ChordialMusic/player1.js' %}"></script>
+		<script src="{% static 'ChordialMusic/player2.js' %}"></script>
+		<script src="{% static 'ChordialMusic/JZZ.js' %}"></script>
+		<script src="{% static 'ChordialMusic/JZZ.midi.SMF.js' %}"></script>
+		<script src="{% static 'ChordialMusic/keyboardlistener.js' %}"></script>
+		<script>
+
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+			ga('create', 'UA-1454657-6', 'auto');
+			ga('send', 'pageview');
+
+			var chord_list = ["C", "Em", "F", "G", "C", "Em", "F", "G", "Em", "Am"];
+
+
+			$(document).ready(function(){
+				var num_display = 9;
+			    var current_percentage = 40;
+			    var interval = 100 / chord_list.length;
+			    var current_index = Math.floor(current_percentage/interval);
+			    var start_index = 0
+			    var end_index = chord_list.length-1; 
+			    var half_num = (num_display-1)/2
+				var output = ""
+
+			    if (current_index > half_num) {
+			    	start_index = current_index - half_num;
+			    }
+			    if (current_index < (chord_list.length-half_num )) {
+			    	end_index = current_index + half_num
+			    }
+			    for (i = start_index; i < end_index + 1; i++) {
+			    	opacity = 1- Math.abs(i - current_index) / half_num;
+			    	output = output + "<span style='opacity: " + opacity + "'>" + chord_list[i] + "</span>" + "\t"
+			    }
+
+			    $('#generated_chords_1').html(output)
+			});
+
+		</script>
+
 		<style type="text/css">
 			body {background:#f8f8f9;}
-			h1 {text-shadow:2px 3px 1px #ccc;}
-			h1,h2,h3,h4 {font-family: 'Bree Serif', serif;}
+
+			h1,h2,h3,h4 {
+				font-family: 'Avenir', sans-serif;
+			}
+
 			#select-file {display:none;}
+
+			.player_block {
+				border-radius: 8px;
+				background: #00738D;
+				padding: 25px 60px 25px 60px;
+				box-shadow: 0px 2px 4px rbga(0, 0, 0, .4);
+				margin-bottom: 200px;
+			}
+
+			.icon {
+				display: inline;
+				width: 40px;
+			}
+
+			.title_div {
+				margin-bottom: 30px;
+			}
+
+			h1.block_title {
+				display: inline;
+				font-weight: 500;
+				font-size: 36px;
+				padding-left: 10px;
+				margin-bottom: 90px;
+				color: white;
+				opacity: 0.4;
+			}
+
+			.chords_display {
+				text-align: center;
+			}
+
+			p.chords {
+				font-family: 'Garamond', serif;
+				font-weight: 600;
+				font-size: 36px;
+				color: white;
+				display: inline;
+			}
+
+			.progress_bar {
+				margin-top: 40px;
+				margin-bottom: 40px;
+				background: #f7f7f7;
+				opacity: 0.55;
+			}
+
+			.progress_bar_fill {
+				height: 20px;
+				background: #FF005C;
+				width:0%;
+			}
+
+			.music_btn {
+				border: none;
+				background-color: transparent;
+				height: 25px;
+			}
+
+			.music_btn img {
+				height: 100%;
+			}
+
+			.play_btn {
+				padding-left: 43%;
+			}
+
+
 		</style>
 	</head>
+
 	<body>
 
 		<div class="container" style="padding-top:12px;">
 			<div class="row">
 				<div class="twelve columns">
+					
+					<div id="out">
+						<button class="button" onclick="startRecording()">Start Recording</button>
+						<button class="button" onclick="stopRecording()">Stop Recording</button>
+					</div>
+					
 					<h1>Chordial Music</h1>
 					<h4>Choose a Midi File</h4>
 					<p id="select-file">
@@ -38,9 +161,11 @@
 
 					</p>
 					<p id="loading">Loading soundfont...</p>
-					<div style="border:1px solid #ccc;margin-bottom:12px;background:#f7f7f7;">
-						<div id="play-bar" style="height:20px;background:#33C3F0;width:0%;"></div>
+
+					<div class="progress_bar">
+						<div id="play-bar" class="progress_bar_fill" id="play-bar-chord1"></div>
 					</div>
+
 					<p>
 						<button class="button button-primary" id="play-button" onclick="Player.isPlaying() ? pause() : play();" disabled="disabled">Play</button>
 						<button class="button" onclick="stop()">Stop</button>
@@ -54,15 +179,32 @@
 					</p>
 					<div id="events" class="well"></div>
 
-					<p hidden="true">
 
-						<h1>Chord Progression 1 </h1>
+					<div class="player_block">
+						<div class = "title_div">
+							<img class="icon" src="{% static 'ChordialMusic/assets/computer@2x.png' %}">
+							<h1 class="block_title">Chord Progression 1 </h1>
+						</div>
+						<!--
 						<p> {{song.original}} </p>
 						<p> {{song.fileWithChords}} </p>
 						<form name="form1" method="post" action="" enctype="multipart/form-data">
     						<input type="file" name="file1" onchange="loadFile1()" onclick="stop1()" />
 							{% csrf_token %}
 						</form>
+						-->
+
+						<button class="button" onclick="getChordFile()" >Load Songs to Player</button>
+						<p id="loading-chord1">Loading soundfont...</p>
+
+						<div class="chords_display">
+							<p class="chords" id="generated_chords_1"></p>
+						</div>
+
+						<div class="progress_bar">
+							<div class="progress_bar_fill" id="play-bar-chord1"></div>
+						</div>
+
 						<form method="get" action="download_chord" enctype="multipart/form-data">
     						<input type="hidden" id ="song_id" onchange="getChordFile()" name="song_id" value="{{id}}">
 							<input type="hidden" id ="original_song_id" onchange="getChordFile()" name="o_id" value="{{o_id}}">
@@ -70,23 +212,23 @@
 							<input type="submit" value="Dowload">
 						</form>
 
-						<button class="button" onclick="getChordFile()">Load Songs to Player</button>
-						<p id="loading-chord1">Loading soundfont...</p>
-						<div style="border:1px solid #ccc;margin-bottom:12px;background:#f7f7f7;">
-						<div id="play-bar-chord1" style="height:20px;background:#33C3F0;width:0%;"></div>
+						<div>
+							<button class="button music_btn play_btn" id="play-button-chord1" onclick="Player1.isPlaying() ? pause1() : play1();" disabled="disabled">
+								<img class="music_icon" src="{% static 'ChordialMusic/assets/pause.png' %}">
+							</button>
+							<button class="button music_btn stop_btn" onclick="stop1()">
+								<img class="music_icon" src="{% static 'ChordialMusic/assets/stop.png' %}">
+							</button>
 						</div>
-						<p>
-						<button class="button button-primary" id="play-button-chord1" onclick="Player1.isPlaying() ? pause1() : play1();" disabled="disabled">Play</button>
-						<button class="button" onclick="stop1()">Stop</button>
-						</p>
-						<hr />
+
 						<p>
 						Tempo: <span id="tempo-display-chord1"></span> bpm<br />
 						<input type="range" onchange="Player1.pause();Player1.setTempo(this.value);Player1.play()" min="50" max="200">
 						<br />
 						MIDI File Format: <span id="file-format-display-chord1"></span>
 						</p>
-					</p>
+
+					</div>
 					<!--
 					<h4>Tempo</h4>
 					<p>
@@ -98,18 +240,6 @@
 			</div>
 		</div>
 
-		<script src="{% static 'ChordialMusic/midiplayer.min.js' %}"></script>
-		<script src="{% static 'ChordialMusic/soundfont-player.min.js' %}"></script>
-		<script src="{% static 'ChordialMusic/player1.js' %}"></script>
-		<script src="{% static 'ChordialMusic/player2.js' %}"></script>
-		<script>
-			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-			})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-			ga('create', 'UA-1454657-6', 'auto');
-			ga('send', 'pageview');
-		</script>
 	</body>
 </html>
 

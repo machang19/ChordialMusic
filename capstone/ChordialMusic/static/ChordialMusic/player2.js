@@ -4,18 +4,19 @@ var AudioContext = window.AudioContext || window.webkitAudioContext || false;
 var ac = new AudioContext || new webkitAudioContext;
 var eventsDiv = document.getElementById('events');
 
+
 var changeTempo1 = function(tempo) {
 	Player1.tempo = tempo;
 }
 
 var play1 = function() {
 	Player1.play();
-	document.getElementById('play-button-chord1').innerHTML = 'Pause';
+	$('#play-button-chord1').children('img').attr('src') = "{% static 'ChordialMusic/assets/pause.png' %}"
 }
 
 var pause1 = function() {
 	Player1.pause();
-	document.getElementById('play-button-chord1').innerHTML = 'Play';
+    $('#play-button-chord1').children('img').attr('src') = "{% static 'ChordialMusic/assets/play.png' %}"
 }
 
 var stop1 = function() {

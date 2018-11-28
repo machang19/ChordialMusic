@@ -4,6 +4,7 @@ var AudioContext = window.AudioContext || window.webkitAudioContext || false;
 var ac = new AudioContext || new webkitAudioContext;
 var eventsDiv = document.getElementById('events');
 
+
 var changeTempo = function(tempo) {
 	Player.tempo = tempo;
 }

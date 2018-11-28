@@ -3,5 +3,5 @@ from django.db import models
 # Create your models here.
 
 class ChordProgression(models.Model):
-    songName = models.CharField(max_length=200)
-    chords = models.CharField(max_length=600)
+    song_name = models.TextField(max_length=200)
+    chords = models.TextField(max_length=600)

@@ -11,69 +11,69 @@ from django.utils.encoding import smart_str
 from math import ceil
 from mido import MidiFile, MidiTrack, Message
 import os
-# from mlRun import predict
+#from mlRun import predict
 
-#import keras.models
+import keras.models
 import numpy as np
 
 from ChordialMusic.models import ChordProgression
 
-# model_path = "ChordialMusic/mlModels/b128_e50_lstm64_0.3_0.3x2"
-# model = keras.models.load_model(model_path)
-# model._make_predict_function()
-#
-# window = 4
-# Chords = {0: 'A', 1: 'A#', 2: 'B', 3: 'C', 4: 'C#', 5: 'D', 6: 'D#', 7: 'E', 8: 'F', 9: 'F#', 10: 'G', 11: 'G#', 12: 'Am', 13: 'A#m', 14: 'Bm', 15: 'Cm', 16: 'C#m', 17: 'Dm', 18: 'D#m', 19: 'Em', 20: 'Fm', 21: 'F#m', 22: 'Gm', 23: 'G#m'}
-# ChordToNote = {
-#     'A':   [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0],
-#     'A#':  [0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
-#     'B':   [0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0],
-#     'C':   [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0],
-#     'C#':  [0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1],
-#     'D':   [1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0],
-#     'D#':  [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0],
-#     'E':   [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1],
-#     'F':   [1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
-#     'F#':  [0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-#     'G':   [0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0],
-#     'G#':  [0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1],
-#     'Am':  [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0],
-#     'A#m': [0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
-#     'Bm':  [0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0],
-#     'Cm':  [0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0],
-#     'C#m': [0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1],
-#     'Dm':  [1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
-#     'D#m': [0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0],
-#     'Em':  [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0],
-#     'Fm':  [0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1],
-#     'F#m': [1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-#     'Gm':  [0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0],
-#     'G#m': [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1]
-# }
-#
-# def transform(i, key_fifth):
-#     if i < 12:
-#         return (i - 5*key_fifth) % 12
-#     else:
-#         return (((i - 12) - 5*key_fifth) % 12) + 12
-#
-# def predict(inp, numBars, key_fifth):
-#     res = []
-#     chords = []
-#     second = []
-#     # print(list(inp))
-#     pred = model.predict(inp)
-#     for x in range(0, numBars):
-#         argmax = np.argmax(pred[x], axis = 1)
-#         for i, arg in enumerate(argmax):
-#             arg2 = pred[x][i].argsort()[-2]
-#             if (x % 2 == 0):
-#                 res.append(ChordToNote[Chords[transform(arg, key_fifth)]])
-#                 chords.append(Chords[transform(arg, key_fifth)])
-#                 second.append(Chords[transform(arg2, key_fifth)])
-#     print(chords)
-#     print(second)
-#     return res, chords
+model_path = "ChordialMusic/mlModels/b128_e50_lstm64_0.3_0.3x2"
+model = keras.models.load_model(model_path)
+model._make_predict_function()
+
+window = 4
+Chords = {0: 'A', 1: 'A#', 2: 'B', 3: 'C', 4: 'C#', 5: 'D', 6: 'D#', 7: 'E', 8: 'F', 9: 'F#', 10: 'G', 11: 'G#', 12: 'Am', 13: 'A#m', 14: 'Bm', 15: 'Cm', 16: 'C#m', 17: 'Dm', 18: 'D#m', 19: 'Em', 20: 'Fm', 21: 'F#m', 22: 'Gm', 23: 'G#m'}
+ChordToNote = {
+    'A':   [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0],
+    'A#':  [0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
+    'B':   [0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0],
+    'C':   [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0],
+    'C#':  [0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1],
+    'D':   [1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0],
+    'D#':  [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0],
+    'E':   [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+    'F':   [1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
+    'F#':  [0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
+    'G':   [0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0],
+    'G#':  [0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1],
+    'Am':  [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0],
+    'A#m': [0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
+    'Bm':  [0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0],
+    'Cm':  [0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0],
+    'C#m': [0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1],
+    'Dm':  [1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
+    'D#m': [0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0],
+    'Em':  [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0],
+    'Fm':  [0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1],
+    'F#m': [1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
+    'Gm':  [0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0],
+    'G#m': [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+}
+
+def transform(i, key_fifth):
+    if i < 12:
+        return (i - 5*key_fifth) % 12
+    else:
+        return (((i - 12) - 5*key_fifth) % 12) + 12
+
+def predict(inp, numBars, key_fifth):
+    res = []
+    chords = []
+    second = []
+    # print(list(inp))
+    pred = model.predict(inp)
+    for x in range(0, numBars):
+        argmax = np.argmax(pred[x], axis = 1)
+        for i, arg in enumerate(argmax):
+            arg2 = pred[x][i].argsort()[-2]
+            if (x % 2 == 0):
+                res.append(ChordToNote[Chords[transform(arg, key_fifth)]])
+                chords.append(Chords[transform(arg, key_fifth)])
+                second.append(Chords[transform(arg2, key_fifth)])
+    print(chords)
+    print(second)
+    return res, chords
 
 def handle_uploaded_file(request):
     f = request.FILES["file"]
@@ -82,13 +82,15 @@ def handle_uploaded_file(request):
             destination.write(chunk)
 
     (result, channels, mid2, bar_length, num_bars, key_fifth) = parse_midi_file(default_storage.path('tmp/'+f.name))
-    #ml_arr,chords = predict(np.array(result), len(result), key_fifth)
-    ml_arr,chords = ([[1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0],[0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0],[1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0],[0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0]], ["A","A#", "A", "A#"])
+    ml_arr,chords = predict(np.array(result), len(result), key_fifth)
+    #ml_arr,chords = ([[1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0],[0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0],[1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0],[0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0]], ["A","A#", "A", "A#"])
     f_name = output_to_midi(ml_arr, mid2, bar_length, channels, "chords_" + f.name)
     str_chords = ""
     for c in chords:
         str_chords += c + " "
-    model = ChordProgression(f.name, str_chords)
+    print (f.name)
+    print (str_chords)
+    model = ChordProgression(song_name = f.name, chords = str_chords)
     model.save()
     return render(request, 'upload.html', {"id": f_name, "o_id": f.name, "pk": model.pk})
 
