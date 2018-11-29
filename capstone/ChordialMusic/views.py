@@ -199,7 +199,8 @@ def output_to_midi(ml_arr, mid, barlength, channels, file_name):
     file_full_path = default_storage.path('tmp/'+file_name)
     return file_name
 
-def get_chords(request, id):
+def get_chords(request):
+    id = file_name = request.GET["song_id"]
     chords = get_object_or_404(ChordProgression, id=id)
     return HttpResponse(chords.chords)
 

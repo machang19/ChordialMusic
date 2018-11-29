@@ -40,27 +40,27 @@
 			
 			var chord_list = ["C", "Em", "F", "G", "C", "Em", "F", "G", "Em", "Am"];
 			$(document).ready(function(){
-				var num_display = 9;
-			    var current_percentage = 0;
-			    var interval = 100 / chord_list.length;
-			    var current_index = Math.floor(current_percentage/interval);
-			    var start_index = 0
-			    var end_index = chord_list.length-1; 
-			    var half_num = (num_display-1)/2
-				var output = ""
+				<!--var num_display = 9;-->
+			    <!--var current_percentage = 0;-->
+			    <!--var interval = 100 / chord_list.length;-->
+			    <!--var current_index = Math.floor(current_percentage/interval);-->
+			    <!--var start_index = 0-->
+			    <!--var end_index = chord_list.length-1; -->
+			    <!--var half_num = (num_display-1)/2-->
+				<!--var output = ""-->
 
-			    if (current_index > half_num) {
-			    	start_index = current_index - half_num;
-			    }
-			    if (current_index < (chord_list.length-half_num )) {
-			    	end_index = current_index + half_num
-			    }
-			    for (i = start_index; i < end_index + 1; i++) {
-			    	opacity = 1- Math.abs(i - current_index) / half_num;
-			    	output = output + "<span style='opacity: " + opacity + "'>" + chord_list[i] + "</span>" + "\t"
-			    }
+			    <!--if (current_index > half_num) {-->
+			    	<!--start_index = current_index - half_num;-->
+			    <!--}-->
+			    <!--if (current_index < (chord_list.length-half_num )) {-->
+			    	<!--end_index = current_index + half_num-->
+			    <!--}-->
+			    <!--for (i = start_index; i < end_index + 1; i++) {-->
+			    	<!--opacity = 1- Math.abs(i - current_index) / half_num;-->
+			    	<!--output = output + "<span style='opacity: " + opacity + "'>" + chord_list[i] + "</span>" + "\t"-->
+			    <!--}-->
 
-			    $('#generated_chords_1').html(output)
+			    <!--$('#generated_chords_1').html(output)-->
 			});
 
 			function playerFadeIn() {
