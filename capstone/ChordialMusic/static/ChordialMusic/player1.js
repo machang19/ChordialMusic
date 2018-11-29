@@ -11,17 +11,18 @@ var changeTempo = function(tempo) {
 
 var play = function() {
 	Player.play();
-	document.getElementById('play-button').innerHTML = 'Pause';
+	$('#play-button').children('img').attr('src', "/static/assets/pause.png");
 }
 
 var pause = function() {
 	Player.pause();
-	document.getElementById('play-button').innerHTML = 'Play';
+	$('#play-button').children('img').attr('src', "/static/assets/play.png");
 }
 
 var stop = function() {
 	Player.stop();
-	document.getElementById('play-button').innerHTML = 'Play';
+	$('#play-button').children('img').attr('src', "/static/assets/play.png");
+
 }
 
 var buildTracksHtml = function() {

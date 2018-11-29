@@ -11,18 +11,17 @@ var changeTempo1 = function(tempo) {
 
 var play1 = function() {
 	Player1.play();
-    console.log("hh")
-	$('#play-button-chord1').children('img').attr('src', "{% static 'assets/pause.png' %}");
+	$('#play-button-chord1').children('img').attr('src', "/static/assets/pause.png");
 }
 
 var pause1 = function() {
 	Player1.pause();
-    $('#play-button-chord1').children('img').attr('src', "{% static 'assets/play.png' %}");
+    $('#play-button-chord1').children('img').attr('src', "/static/assets/play.png");
 }
 
 var stop1 = function() {
 	Player1.stop();
-	document.getElementById('play-button-chord1').innerHTML = 'Play';
+	$('#play-button-chord1').children('img').attr('src', "/static/assets/play.png");
 }
 
 var buildTracksHtml1 = function() {
@@ -170,6 +169,7 @@ Soundfont.instrument(ac, 'https://raw.githubusercontent.com/gleitz/midi-js-sound
             var start_index = 0
             var end_index = chord_list.length-1; 
             var half_num = (num_display-1)/2
+            var color_style = ""
             var output = ""
 
             if (current_index > half_num) {
@@ -180,7 +180,12 @@ Soundfont.instrument(ac, 'https://raw.githubusercontent.com/gleitz/midi-js-sound
             }
             for (i = start_index; i < end_index + 1; i++) {
                 opacity = 1- Math.abs(i - current_index) / half_num;
-                output = output + "<span style='opacity: " + opacity + "'>" + chord_list[i] + "</span>" + "\t"
+                if (i == current_index) {
+                    color_style = "; color: #F1A35A;"
+                } else {
+                    color_style = ""
+                }
+                output = output + "<span style='opacity: " + opacity + color_style +"'>" + chord_list[i] + "</span>" + "\t"
             }
 
             $('#generated_chords_1').html(output)

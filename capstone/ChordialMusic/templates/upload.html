@@ -1,11 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
+		<!-- things to do:
+			1. when press stop button, progress bar should go back to 0%
+			2. change the flow of upload and loading to player
+			3. make the currently dummy "upload melody" button functional
+			4. the re-upload button is aso dummy right now
+		-->
 		{% load static %}
 		<meta charset="utf-8">
 		<meta name="description" content="Play MIDI files from your browser with MidiPlayerJS" />
 		<meta name="keywords" content="MIDI, music, player, javascript" />
 		<title>Chordial Music</title>
+		<link rel="icon" type="image/png" href="{% static 'assets/favicon.ico' %}">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 
 		<link rel="stylesheet" href="{% static 'ChordialMusic/normalize.css' %}">
@@ -30,9 +37,8 @@
 			ga('create', 'UA-1454657-6', 'auto');
 			ga('send', 'pageview');
 
+			
 			var chord_list = ["C", "Em", "F", "G", "C", "Em", "F", "G", "Em", "Am"];
-
-
 			$(document).ready(function(){
 				var num_display = 9;
 			    var current_percentage = 0;
@@ -57,23 +63,62 @@
 			    $('#generated_chords_1').html(output)
 			});
 
+			function playerFadeIn() {
+				$("#players").fadeIn(500);
+
+			}
+
+
 		</script>
 
 		<style type="text/css">
-			body {background:#f8f8f9;}
+			body {
+				background:#f8f8f9;
+			}
 
 			h1,h2,h3,h4 {
 				font-family: 'Avenir', sans-serif;
+				color: #4E4E4E;
 			}
 
 			#select-file {display:none;}
 
+			.functional_button {
+				border: none;
+				background-color: #01BFE9;
+				color: white;
+			}
+
+			.functional_button img{
+				margin-top: 7px;
+				float:left;
+			}
+
+			.functional_button p{
+				float:left;
+				font-weight: 500;
+				font-size: 20px;
+				margin-left: 10px;
+				color: white;
+			}
+
+			.stop_btn{
+				margin-left: 30px;
+				background-color: transparent;
+				border: 1px solid #555555;
+			}
+
+			.stop_btn p{
+				color: #4E4E4E;
+			}
+
+
 			.player_block {
 				border-radius: 8px;
 				background: #00738D;
-				padding: 25px 60px 25px 60px;
+				padding: 25px 60px 100px 60px;
 				box-shadow: 0px 2px 4px rbga(0, 0, 0, .4);
-				margin-bottom: 200px;
+				margin-bottom: 80px;
 			}
 
 			.icon {
@@ -81,8 +126,16 @@
 				width: 40px;
 			}
 
+			.background_icon {
+				position: fixed;
+				z-index: -1;
+				right: 0;
+				width: 40%;
+				margin-top: 20%;
+			}
+
 			.title_div {
-				margin-bottom: 30px;
+				margin-bottom: 40px;
 			}
 
 			h1.block_title {
@@ -90,6 +143,15 @@
 				font-weight: 500;
 				font-size: 36px;
 				padding-left: 10px;
+				margin-bottom: 60px;
+				color: white;
+				opacity: 0.4;
+			}
+
+			p.normal_text {
+				display: inline;
+				font-weight: 400;
+				font-size: 16px;
 				margin-bottom: 90px;
 				color: white;
 				opacity: 0.4;
@@ -97,6 +159,7 @@
 
 			.chords_display {
 				text-align: center;
+				margin-bottom: 20px;
 			}
 
 			p.chords {
@@ -108,22 +171,27 @@
 			}
 
 			.progress_bar {
-				margin-top: 40px;
-				margin-bottom: 40px;
-				background: #f7f7f7;
-				opacity: 0.55;
+				margin-top: 0px;
+				margin-bottom: 30px;
+				background: #8CBBC8;
+				opacity: 1;
 			}
 
 			.progress_bar_fill {
 				height: 20px;
-				background: #FF005C;
+				background: #F1A35A;
 				width:0%;
+			}
+
+			.control_btns {
+				margin-bottom: 40px;
 			}
 
 			.music_btn {
 				border: none;
 				background-color: transparent;
 				height: 25px;
+				width: 30px;
 			}
 
 			.music_btn img {
@@ -131,116 +199,187 @@
 			}
 
 			.play_btn {
-				margin-left: 43%;
+				margin-left: 38%;
+				margin-right: 6%;
 			}
 
+			.tempo_div {
+				float: left;
+			}
+
+			.download_btn {
+				float: right;
+				margin-top: 15px;
+			}
+
+			.download_icon {
+				height: 24px;
+				display: inline;
+			}
+
+			.btn_text {
+				display: inline;
+				font-weight: 500;
+				font-size: 20px;
+				margin-left: 10px;
+				color: white;
+				opacity: 0.6;
+			}
+
+			/* slider */
+
+			/* end of slider */
 
 		</style>
 	</head>
 
 	<body>
 
-		<div class="container" style="padding-top:12px;">
+		<div class="container" style="padding-top:40px;">
 			<div class="row">
 				<div class="twelve columns">
 					
-					<div id="out">
-						<button class="button" onclick="startRecording()">Start Recording</button>
-						<button class="button" onclick="stopRecording()">Stop Recording</button>
+					<img class="background_icon" src="{% static 'assets/background.png' %}">
+
+					<h1 style="font-weight:400;">Welcome to Chordial Music!</h1>
+					<h4 style="margin-bottom: 30px;">Upload a melody MIDI file or connect a MIDI keyboard to start.</h4>
+
+					<!--This button should ask the user to choose a file, and upload it, basically combining the function of the 
+					original choose file button and upload button-->
+					<button class="button functional_button">
+    					<img class="download_icon" src="{% static 'assets/upload_opaque.png' %}">
+						<p onclick="playerFadeIn()">Upload Melody (dummy)</p>
+    				</button>
+
+    				<h4 style="margin-top: 80px; margin-bottom: 30px;">You can also connect a MIDI keyboard and start playing!</h4>
+    				<div id="out">
+						<button class="button functional_button" onclick="startRecording()">
+							<p>Start Recording</p>
+						</button>
+						<button class="button functional_button stop_btn" onclick="stopRecording()">
+							<p>Stop Recording</p>
+						</button>
 					</div>
-					
-					<h1>Chordial Music</h1>
-					<h4>Choose a Midi File</h4>
+
 					<p id="select-file">
 						<form method="post" action="" enctype="multipart/form-data">
     						<input type="file" name="file" onchange="loadFile()" onclick="Player.stop()" />
-							<input type="submit" value="Upload">
+    						<input type="submit" value="Upload">
 							{% csrf_token %}
 						</form>
-
-
 					</p>
 					<p id="loading">Loading soundfont...</p>
 
-					<div class="progress_bar">
-						<div id="play-bar" class="progress_bar_fill" id="play-bar-chord1"></div>
-					</div>
+					<div id="players" style="display:none;">
 
-					<p>
-						<button class="button button-primary" id="play-button" onclick="Player.isPlaying() ? pause() : play();" disabled="disabled">Play</button>
-						<button class="button" onclick="stop()">Stop</button>
-					</p>
-					<hr />
-					<p>
-						Tempo: <span id="tempo-display"></span> bpm<br />
-						<input type="range" onchange="Player.pause();Player.setTempo(this.value);Player.play()" min="50" max="200">
-						<br />
-						MIDI File Format: <span id="file-format-display"></span>
-					</p>
-					<div id="events" class="well"></div>
+						<!-- original melody player --> 
+						<div class="player_block" style="background:#28252C;">
+							<div class = "title_div">
+								<img class="icon" src="{% static 'assets/original.png' %}">
+								<h1 class="block_title">Original Melody</h1>
+							</div>
+							<div class="progress_bar" style="background:#9E9C9F;">
+								<div id="play-bar" class="progress_bar_fill" id="play-bar-chord1"></div>
+							</div>
 
 
-					<div class="player_block">
-						<div class = "title_div">
-							<img class="icon" src="{% static 'assets/computer@2x.png' %}">
-							<h1 class="block_title">Chord Progression 1 </h1>
+							<!-- play & stop buttons -->
+							<div class="control_btns">
+								<button class="button music_btn play_btn" id="play-button" onclick="Player.isPlaying() ? pause() : play();" disabled="disabled">
+									<img class="music_icon" src="{% static 'assets/pause.png' %}">
+								</button>
+								<button class="button music_btn stop_btn" onclick="stop()">
+									<img class="music_icon" src="{% static 'assets/stop.png' %}">
+								</button>
+							</div>
+
+							<!-- Tempo and re-upload -->
+							<div class="tempo_div">
+								<p class = "tempo_text normal_text">
+									Tempo: <span id="tempo-display"></span> bpm<br />
+								</p>
+									<input class="tempo_slider" type="range" onchange="Player.pause();Player.setTempo(this.value);Player.play()" min="50" max="200">
+								<p style="display:none">
+									MIDI File Format: <span id="file-format-display"></span>
+								</p>
+							</div>
+							<!-- dummy -->
+							<form class="download_btn">
+								<img class="download_icon" src="{% static 'assets/upload.png' %}">
+								<p class="btn_text">Re-upload(dummy)</p>
+							</form>
+						</div>
+
+
+
+
+
+
+
+						<!-- first player block -->
+						<div class="player_block">
+							<div class = "title_div">
+								<img class="icon" src="{% static 'assets/computer@2x.png' %}">
+								<h1 class="block_title">Chord Progression 1 </h1>
+							</div>
+							<!--
+							<p> {{song.original}} </p>
+							<p> {{song.fileWithChords}} </p>
+							<form name="form1" method="post" action="" enctype="multipart/form-data">
+	    						<input type="file" name="file1" onchange="loadFile1()" onclick="stop1()" />
+								{% csrf_token %}
+							</form>
+							-->
+
+							<!-- Lond song button -->
+							<button class="button" onclick="getChordFile()" >Load Songs to Player</button>
+							<p id="loading-chord1">Loading soundfont...</p>
+
+							<!-- Rolling chords -->
+							<div class="chords_display">
+								<p class="chords" id="generated_chords_1"></p>
+							</div>
+
+							<!-- Progress bar -->
+							<div class="progress_bar">
+								<div class="progress_bar_fill" id="play-bar-chord1"></div>
+							</div>
+
+							<!-- play & stop buttons -->
+							<div class="control_btns">
+								<button class="button music_btn play_btn" id="play-button-chord1" onclick="Player1.isPlaying() ? pause1() : play1();" disabled="disabled">
+									<img class="music_icon" src="{% static 'assets/pause.png' %}">
+								</button>
+								<button class="button music_btn stop_btn" onclick="stop1()">
+									<img class="music_icon" src="{% static 'assets/stop.png' %}">
+								</button>
+							</div>
+
+							<!-- Tempo and Download -->
+							<div class="tempo_div">
+								<p class = "tempo_text normal_text">
+									Tempo: <span id="tempo-display-chord1"></span> bpm<br />
+								</p>
+									<input class="tempo_slider" type="range" onchange="Player1.pause();Player1.setTempo(this.value);Player1.play()" min="50" max="200">
+								<p style="display:none">
+									MIDI File Format: <span id="file-format-display-chord1"></span>
+								</p>
+							</div>
+
+							<form class="download_btn" method="get" action="download_chord" enctype="multipart/form-data">
+	    						<input type="hidden" id ="song_id" onchange="getChordFile()" name="song_id" value="{{id}}">
+								<input type="hidden" id ="original_song_id" onchange="getChordFile()" name="o_id" value="{{o_id}}">
+								<input type="hidden" id ="song_pk" onchange="getChordFile()" name="o_id" value="{{pk}}">
+								<img class="download_icon" src="{% static 'assets/download.png' %}">
+								<p class="btn_text">Download</p>
+							</form>
 						</div>
 						<!--
-						<p> {{song.original}} </p>
-						<p> {{song.fileWithChords}} </p>
-						<form name="form1" method="post" action="" enctype="multipart/form-data">
-    						<input type="file" name="file1" onchange="loadFile1()" onclick="stop1()" />
-							{% csrf_token %}
-						</form>
-						-->
-
-						<!-- Lond song button -->
-						<button class="button" onclick="getChordFile()" >Load Songs to Player</button>
-						<p id="loading-chord1">Loading soundfont...</p>
-
-						<!-- Rolling chords -->
-						<div class="chords_display">
-							<p class="chords" id="generated_chords_1"></p>
-						</div>
-
-						<!-- Progress bar -->
-						<div class="progress_bar">
-							<div class="progress_bar_fill" id="play-bar-chord1"></div>
-						</div>
-
-						<!-- Download -->
-						<form method="get" action="download_chord" enctype="multipart/form-data">
-    						<input type="hidden" id ="song_id" onchange="getChordFile()" name="song_id" value="{{id}}">
-							<input type="hidden" id ="original_song_id" onchange="getChordFile()" name="o_id" value="{{o_id}}">
-							<input type="hidden" id ="song_pk" onchange="getChordFile()" name="o_id" value="{{pk}}">
-							<input type="submit" value="Dowload">
-						</form>
-
-						<!-- play & stop buttons -->
-						<div>
-							<button class="button music_btn play_btn" id="play-button-chord1" onclick="Player1.isPlaying() ? pause1() : play1();" disabled="disabled">
-								<img class="music_icon" src="{% static 'assets/pause.png' %}">
-							</button>
-							<button class="button music_btn stop_btn" onclick="stop1()">
-								<img class="music_icon" src="{% static 'assets/stop.png' %}">
-							</button>
-						</div>
-
+						<h4>Tempo</h4>
 						<p>
-						Tempo: <span id="tempo-display-chord1"></span> bpm<br />
-						<input type="range" onchange="Player1.pause();Player1.setTempo(this.value);Player1.play()" min="50" max="200">
-						<br />
-						MIDI File Format: <span id="file-format-display-chord1"></span>
-						</p>
-
+							<input id="test" type="range" min="50" max="200" value="100" onchange="changeTempo(this.value)" style="width:200px;" />
+						</p>-->
 					</div>
-					<!--
-					<h4>Tempo</h4>
-					<p>
-						<input id="test" type="range" min="50" max="200" value="100" onchange="changeTempo(this.value)" style="width:200px;" />
-					</p>-->
-
-
 				</div>
 			</div>
 		</div>
