@@ -150,6 +150,21 @@ Soundfont.instrument(ac, 'https://raw.githubusercontent.com/gleitz/midi-js-sound
 	}
 
 	loadDataUri1 = function(dataUri) {
+        var chord_list = [] 
+        var id = document.getElementById("song_pk").value;
+        console.log(id);
+        var chord_list = []
+        $.ajax({
+            url: "/get_chords",
+            data: "song_id=" + id,
+            success: function(data) {
+                console.log(data)
+                chord_list = data.split(" ");
+                chord_list.splice(-1,1);
+                console.log(chord_list)
+                }
+        });
+
 		Player1 = new MidiPlayer.Player(function(event) {
 			if (event.name == 'Note on' && event.velocity > 0) {
 				instrument.play(event.noteName, ac.currentTime, {gain:event.velocity/100});
@@ -161,16 +176,7 @@ Soundfont.instrument(ac, 'https://raw.githubusercontent.com/gleitz/midi-js-sound
 			document.getElementById('file-format-display-chord1').innerHTML = Player1.format;
 			document.getElementById('play-bar-chord1').style.width = 100 - Player1.getSongPercentRemaining() + '%';
 
-            var id = document.getElementById("song_pk").value;
-            console.log(id);
-            var chord_list = []
-            $.ajax({
-                url: "/chord",
-                data: "song_id=" + id,
-                success: function(data) {
-                    console.log(data)
-                    }
-            });
+            
             var num_display = 9;
             var current_percentage = 100 - Player1.getSongPercentRemaining();
             var interval = 100 / chord_list.length;

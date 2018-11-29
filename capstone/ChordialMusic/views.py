@@ -200,8 +200,10 @@ def output_to_midi(ml_arr, mid, barlength, channels, file_name):
     return file_name
 
 def get_chords(request):
-    id = file_name = request.GET["song_id"]
+    id = request.GET["song_id"]
+    print(id)
     chords = get_object_or_404(ChordProgression, id=id)
+    print(chords.chords)
     return HttpResponse(chords.chords)
 
 def parse_midi_file(filepath):
@@ -214,6 +216,9 @@ def parse_midi_file(filepath):
     channels = set()
     stream1 = stream.Stream()
     bar_length = mid2.ticks_per_beat * numerator
+    print(mid2.ticks_per_beat)
+    print(numerator)
+    print(bar_length)
     for i, track in enumerate(mid2.tracks):
         print('Track {}: {}'.format(i, track.name))
         for msg in track:
@@ -257,10 +262,13 @@ def parse_midi_file(filepath):
         curbar[(index + 5*key_fifth) % 12] += (midi_note.end - midi_note.start)
     result.append(curbar)
     count = 0
+    
     for x in result:
         correctionFactor =  16/bar_length
         for i in range(len(x)):
             x[i] = x[i] * correctionFactor
+
+    print(result)
     window = 4
     fourbar_result = []
     for i in range(0, len(result) - window + 1, 2):

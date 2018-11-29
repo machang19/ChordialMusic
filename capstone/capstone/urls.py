@@ -25,5 +25,5 @@ urlpatterns = [
     url(r'^chord$', views.get_file, name='chord'),
     url(r'^download_chord$', views.download_file, name='download'),
     url(r'^default_path$', views.get_temp_file_path, name='download'),
-    url(r'^get_chords/(?P<id>\d+)$', views.get_chords, name='get_chords')
+    url(r'^get_chords$', views.get_chords, name='get_chords')
 ]

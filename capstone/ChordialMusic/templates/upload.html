@@ -102,6 +102,12 @@
 				color: white;
 			}
 
+			.upload_icon {
+				height: 24px;
+				display: inline;
+			}
+
+
 			.stop_btn{
 				margin-left: 30px;
 				background-color: transparent;
@@ -226,9 +232,30 @@
 				opacity: 0.6;
 			}
 
-			/* slider */
 
-			/* end of slider */
+			/* choose file button */
+			.inputfile {
+				width: 0.1px;
+				height: 0.1px;
+				opacity: 0;
+				overflow: hidden;
+				position: absolute;
+				z-index: -1;
+			}
+
+			.inputfile + label {
+			    font-size: 1.25em;
+			    font-weight: 700;
+			    color: white;
+			    background-color: black;
+			    display: inline-block;
+			}
+
+			.inputfile:focus + label,
+			.inputfile + label:hover {
+			    background-color: red;
+			}
+			/* end of choose file button */
 
 		</style>
 	</head>
@@ -246,10 +273,19 @@
 
 					<!--This button should ask the user to choose a file, and upload it, basically combining the function of the 
 					original choose file button and upload button-->
-					<button class="button functional_button">
-    					<img class="download_icon" src="{% static 'assets/upload_opaque.png' %}">
-						<p onclick="playerFadeIn()">Upload Melody (dummy)</p>
-    				</button>
+					<p id="select-file">
+						<form method="post" action="" enctype="multipart/form-data">
+    						<label for="file_upload" class="functional_button" style="height:40px;border-radius: 6px; width:285px;">
+    							<img class="upload_icon" src="{% static 'assets/upload_opaque.png' %}" style="padding-left:40px;">
+								<p onclick="playerFadeIn()" style="padding-top:5px;">UPLOAD MELODY</p>
+    						</label>
+    						<input class="inputfile" type="file" id="file_upload" name="file" onchange="loadFile()" onclick="Player.stop()"/>
+    						<input type="submit" value="Upload">
+							{% csrf_token %}
+						</form>
+					</p>
+					<p id="loading">Loading soundfont...</p>
+
 
     				<h4 style="margin-top: 80px; margin-bottom: 30px;">You can also connect a MIDI keyboard and start playing!</h4>
     				<div id="out">
@@ -261,14 +297,6 @@
 						</button>
 					</div>
 
-					<p id="select-file">
-						<form method="post" action="" enctype="multipart/form-data">
-    						<input type="file" name="file" onchange="loadFile()" onclick="Player.stop()" />
-    						<input type="submit" value="Upload">
-							{% csrf_token %}
-						</form>
-					</p>
-					<p id="loading">Loading soundfont...</p>
 
 					<div id="players" style="display:none;">
 
@@ -303,11 +331,6 @@
 									MIDI File Format: <span id="file-format-display"></span>
 								</p>
 							</div>
-							<!-- dummy -->
-							<form class="download_btn">
-								<img class="download_icon" src="{% static 'assets/upload.png' %}">
-								<p class="btn_text">Re-upload(dummy)</p>
-							</form>
 						</div>
 
 
@@ -371,7 +394,7 @@
 								<input type="hidden" id ="original_song_id" onchange="getChordFile()" name="o_id" value="{{o_id}}">
 								<input type="hidden" id ="song_pk" onchange="getChordFile()" name="o_id" value="{{pk}}">
 								<img class="download_icon" src="{% static 'assets/download.png' %}">
-								<p class="btn_text">Download</p>
+								<input type="submit" class="btn_text">Download</input>
 							</form>
 						</div>
 						<!--

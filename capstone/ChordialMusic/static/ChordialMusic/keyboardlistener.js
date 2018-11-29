@@ -8,7 +8,8 @@ var first = true;
 var trk0 = new JZZ.MIDI.SMF.MTrk(); smf.push(trk0); // First track in Type 1 MIDI file is normally used for tempo changes
 trk0.smfSeqName('Little Lame') // The name of the first track serves as the file title
     .smfBPM(bpm) // Tempo. Normally set at clock 0, but can be also changed later
-    .ch(0) // all subsequent messahes will go to channel 0
+    .ch(0)
+    .smfTimeSignature(4,4) // all subsequent messahes will go to channel 0
     .program(0x0b); // set channel 0 program to vibraphone
      // otherwise it will end on clock 1690
 
