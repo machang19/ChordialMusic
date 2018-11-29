@@ -75,6 +75,7 @@ Soundfont.instrument(ac, 'https://raw.githubusercontent.com/gleitz/midi-js-sound
 
 			document.getElementById('play-button').removeAttribute('disabled');
 
+			$('#melody_player').fadeIn(700);
 			//buildTracksHtml();
 			play();
 		}, false);

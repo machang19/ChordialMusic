@@ -63,10 +63,18 @@
 			    <!--$('#generated_chords_1').html(output)-->
 			});
 
-			function playerFadeIn() {
-				$("#players").fadeIn(500);
-
-			}
+			$(document).ready(function(){
+				//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+				if (true) { //decide whether this is a fresh page now, or has been loaded with melody
+				//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+					$('#melody_player').fadeIn(700, function() {
+						$('#chord_player_1').fadeIn(700);
+  					});
+				}
+				//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+				//do whatever the LOAD SONGS TO PLAYER is doing here
+				//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			});
 
 
 		</script>
@@ -232,8 +240,7 @@
 				opacity: 0.6;
 			}
 
-
-			/* choose file button */
+			/* choose file and download button */
 			.inputfile {
 				width: 0.1px;
 				height: 0.1px;
@@ -255,6 +262,15 @@
 			.inputfile + label:hover {
 			    background-color: red;
 			}
+
+			#download_button {
+				font-weight: 500;
+				font-size: 16px;
+				margin-left: 10px;
+				color: white;
+				opacity: 0.6;
+			}
+
 			/* end of choose file button */
 
 		</style>
@@ -277,10 +293,10 @@
 						<form method="post" action="" enctype="multipart/form-data">
     						<label for="file_upload" class="functional_button" style="height:40px;border-radius: 6px; width:285px;">
     							<img class="upload_icon" src="{% static 'assets/upload_opaque.png' %}" style="padding-left:40px;">
-								<p onclick="playerFadeIn()" style="padding-top:5px;">UPLOAD MELODY</p>
+								<p style="padding-top:5px;">UPLOAD MELODY</p>
     						</label>
     						<input class="inputfile" type="file" id="file_upload" name="file" onchange="loadFile()" onclick="Player.stop()"/>
-    						<input type="submit" value="Upload">
+    						<input style="display:block;" type="submit" value="Upload">
 							{% csrf_token %}
 						</form>
 					</p>
@@ -298,10 +314,9 @@
 					</div>
 
 
-					<div id="players" style="display:none;">
-
+					<div id="players">
 						<!-- original melody player --> 
-						<div class="player_block" style="background:#28252C;">
+						<div class="player_block" id="melody_player" style="background:#28252C; margin-top:80px; display:none;">
 							<div class = "title_div">
 								<img class="icon" src="{% static 'assets/original.png' %}">
 								<h1 class="block_title">Original Melody</h1>
@@ -335,12 +350,8 @@
 
 
 
-
-
-
-
 						<!-- first player block -->
-						<div class="player_block">
+						<div class="player_block" id="chord_player_1" style="display:none;">
 							<div class = "title_div">
 								<img class="icon" src="{% static 'assets/computer@2x.png' %}">
 								<h1 class="block_title">Chord Progression 1 </h1>
@@ -355,7 +366,7 @@
 							-->
 
 							<!-- Lond song button -->
-							<button class="button" onclick="getChordFile()" >Load Songs to Player</button>
+							<button class="button" onclick="getChordFile()" style="display:none;" >Load Songs to player</button>
 							<p id="loading-chord1">Loading soundfont...</p>
 
 							<!-- Rolling chords -->
@@ -389,14 +400,16 @@
 								</p>
 							</div>
 
+
 							<form class="download_btn" method="get" action="download_chord" enctype="multipart/form-data">
 	    						<input type="hidden" id ="song_id" onchange="getChordFile()" name="song_id" value="{{id}}">
 								<input type="hidden" id ="original_song_id" onchange="getChordFile()" name="o_id" value="{{o_id}}">
 								<input type="hidden" id ="song_pk" onchange="getChordFile()" name="o_id" value="{{pk}}">
-								<img class="download_icon" src="{% static 'assets/download.png' %}">
-								<input type="submit" class="btn_text">Download</input>
+								<input type="submit" value="Download" id="download_button" />
 							</form>
 						</div>
+
+
 						<!--
 						<h4>Tempo</h4>
 						<p>
