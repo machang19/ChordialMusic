@@ -64,16 +64,19 @@
 			});
 
 			$(document).ready(function(){
+				var id = document.getElementById("song_id").value;
+				console.log(id);
+				if (id) { //decide whether this is a fresh page now, or has been loaded with melody
 				//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-				if (true) { //decide whether this is a fresh page now, or has been loaded with melody
-				//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+					console.log(id);
 					$('#melody_player').fadeIn(700, function() {
 						$('#chord_player_1').fadeIn(700);
   					});
+					setTimeout(function(){
+						console.log("here");
+    					getChordFile();
+					}, 3000);
 				}
-				//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-				//do whatever the LOAD SONGS TO PLAYER is doing here
-				//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			});
 
 
