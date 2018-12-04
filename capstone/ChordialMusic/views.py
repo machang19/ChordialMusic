@@ -92,7 +92,7 @@ def handle_uploaded_file(request):
     print (str_chords)
     model = ChordProgression(song_name = f.name, chords = str_chords)
     model.save()
-    return render(request, 'upload.html', {"id": f_name, "o_id": f.name, "pk": model.pk})
+    return render(request, 'upload.html', {"id1": f_name, "o_id": f.name, "pk1": model.pk, "id2": f_name, "pk2": model.pk})
 
 class Note:
     def __init__(self, note, start, end):

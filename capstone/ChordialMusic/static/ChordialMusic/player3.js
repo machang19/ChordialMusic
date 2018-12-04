@@ -1,31 +1,31 @@
-var MidiPlayer1 = MidiPlayer;
-var loadFile1, loadDataUri1, Player1;
+var MidiPlayer2 = MidiPlayer;
+var loadFile2, loadDataUri2, Player2;
 var AudioContext = window.AudioContext || window.webkitAudioContext || false;
 var ac = new AudioContext || new webkitAudioContext;
 var eventsDiv = document.getElementById('events');
 
 
-var changeTempo1 = function(tempo) {
-	Player1.tempo = tempo;
+var changeTempo2 = function(tempo) {
+	Player2.tempo = tempo;
 }
 
-var play1 = function() {
-	Player1.play();
-	$('#play-button-chord1').children('img').attr('src', "/static/assets/pause.png");
+var play2 = function() {
+	Player2.play();
+	$('#play-button-chord2').children('img').attr('src', "/static/assets/pause.png");
 }
 
-var pause1 = function() {
-	Player1.pause();
-    $('#play-button-chord1').children('img').attr('src', "/static/assets/play.png");
+var pause2 = function() {
+	Player2.pause();
+    $('#play-button-chord2').children('img').attr('src', "/static/assets/play.png");
 }
 
-var stop1 = function() {
-	Player1.stop();
-	$('#play-button-chord1').children('img').attr('src', "/static/assets/play.png");
+var stop2 = function() {
+	Player2.stop();
+	$('#play-button-chord2').children('img').attr('src', "/static/assets/play.png");
 }
 
-var buildTracksHtml1 = function() {
-	Player1.tracks.forEach(function(item, index) {
+var buildTracksHtml2 = function() {
+	Player2.tracks.forEach(function(item, index) {
 		var trackDiv = document.createElement('div');
 		trackDiv.id = 'track-' + (index+1);
 		var h5 = document.createElement('h5');
@@ -37,12 +37,36 @@ var buildTracksHtml1 = function() {
 	});
 }
 
+function getChordFile() {
+    var id = document.getElementById("song_id2").value;
+    console.log(id);
+    $.ajax({
+        url: "/chord",
+        data: "song_id=" + id,
+        success: loadDataUri2
+    });
+    var id = document.getElementById("song_id1").value;
+    console.log(id);
+    $.ajax({
+        url: "/chord",
+        data: "song_id=" + id,
+        success: loadDataUri1
+    });
+    var id = document.getElementById("original_song_id").value;
+    console.log(id);
+    $.ajax({
+        url: "/chord",
+        data: "song_id=" + id,
+        success: loadDataUri
+    });
+}
 
+function generateChords() {
 
-
+}
 
 Soundfont.instrument(ac, 'https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/gh-pages/MusyngKite/acoustic_guitar_nylon-mp3.js').then(function (instrument) {
-	document.getElementById('loading-chord1').style.display = 'none';
+	document.getElementById('loading-chord2').style.display = 'none';
 	document.getElementById('select-file').style.display = 'block';
 
     function getCSRFToken() {
@@ -55,38 +79,40 @@ Soundfont.instrument(ac, 'https://raw.githubusercontent.com/gleitz/midi-js-sound
     return "unknown";
     }
 
-	loadFile1 = function() {
-		var file    = document.forms['form1']['file1'].files[0];
+	loadFile2 = function() {
+		var file    = document.forms['form2']['file2'].files[0];
 		console.log(file)
 		var reader  = new FileReader();
 		console.log(getCSRFToken());
 		if (file) reader.readAsArrayBuffer(file);
 
 		reader.addEventListener("load", function () {
-			Player1 = new MidiPlayer.Player(function(event) {
+			Player2 = new MidiPlayer.Player(function(event) {
 				if (event.name == 'Note on') {
 					instrument.play(event.noteName, ac.currentTime, {gain:event.velocity/100});
 					//document.querySelector('#track-' + event.track + ' code').innerHTML = JSON.stringify(event);
 				}
 
-				document.getElementById('tempo-display-chord1').innerHTML = Player1.tempo;
-				document.getElementById('file-format-display-chord1').innerHTML = Player1.format;
-				document.getElementById('play-bar-chord1').style.width = 100 - Player1.getSongPercentRemaining() + '%';
+				document.getElementById('tempo-display-chord2').innerHTML = Player2.tempo;
+				document.getElementById('file-format-display-chord2').innerHTML = Player2.format;
+				document.getElementById('play-bar-chord2').style.width = 100 - Player2.getSongPercentRemaining() + '%';
 			});
 
-			Player1.loadArrayBuffer(reader.result);
+			Player2.loadArrayBuffer(reader.result);
 
-			document.getElementById('play-button-chord1').removeAttribute('disabled');
+			document.getElementById('play-button-chord2').removeAttribute('disabled');
 
 			//buildTracksHtml();
-			play1();
+			play2();
 		}, false);
 	}
 
 
 
-	loadDataUri1 = function(dataUri) {
-        var chord_list = [] 
+
+
+	loadDataUri2 = function(dataUri) {
+        var chord_list = []
         var id = document.getElementById("song_pk").value;
         console.log(id);
         var chord_list = []
@@ -101,24 +127,24 @@ Soundfont.instrument(ac, 'https://raw.githubusercontent.com/gleitz/midi-js-sound
                 }
         });
 
-		Player1 = new MidiPlayer.Player(function(event) {
+		Player2 = new MidiPlayer.Player(function(event) {
 			if (event.name == 'Note on' && event.velocity > 0) {
 				instrument.play(event.noteName, ac.currentTime, {gain:event.velocity/100});
 				//document.querySelector('#track-' + event.track + ' code').innerHTML = JSON.stringify(event);
 				//console.log(event);
 			}
 
-			document.getElementById('tempo-display-chord1').innerHTML = Player1.tempo;
-			document.getElementById('file-format-display-chord1').innerHTML = Player1.format;
-			document.getElementById('play-bar-chord1').style.width = 100 - Player1.getSongPercentRemaining() + '%';
+			document.getElementById('tempo-display-chord2').innerHTML = Player2.tempo;
+			document.getElementById('file-format-display-chord2').innerHTML = Player2.format;
+			document.getElementById('play-bar-chord2').style.width = 100 - Player2.getSongPercentRemaining() + '%';
 
-            
+
             var num_display = 9;
-            var current_percentage = 100 - Player1.getSongPercentRemaining();
+            var current_percentage = 100 - Player2.getSongPercentRemaining();
             var interval = 100 / chord_list.length;
             var current_index = Math.floor(current_percentage/interval);
             var start_index = 0
-            var end_index = chord_list.length-1; 
+            var end_index = chord_list.length-1;
             var half_num = (num_display-1)/2
             var color_style = ""
             var output = ""
@@ -139,21 +165,20 @@ Soundfont.instrument(ac, 'https://raw.githubusercontent.com/gleitz/midi-js-sound
                 output = output + "<span style='opacity: " + opacity + color_style +"'>" + chord_list[i] + "</span>" + "\t"
             }
 
-            $('#generated_chords_1').html(output)
+            $('#generated_chords_2').html(output)
 
 
 		});
 		console.log(dataUri);
-		Player1.loadDataUri(dataUri);
+		Player2.loadDataUri(dataUri);
 
-		document.getElementById('play-button-chord1').removeAttribute('disabled');
+		document.getElementById('play-button-chord2').removeAttribute('disabled');
 
 		//buildTracksHtml();
-		play1();
+		play2();
 	}
 
 
 
 
 });
-

@@ -25,6 +25,7 @@
 		<script src="{% static 'ChordialMusic/soundfont-player.min.js' %}"></script>
 		<script src="{% static 'ChordialMusic/player1.js' %}"></script>
 		<script src="{% static 'ChordialMusic/player2.js' %}"></script>
+		<script src="{% static 'ChordialMusic/player3.js' %}"></script>
 		<script src="{% static 'ChordialMusic/JZZ.js' %}"></script>
 		<script src="{% static 'ChordialMusic/JZZ.midi.SMF.js' %}"></script>
 		<script src="{% static 'ChordialMusic/keyboardlistener.js' %}"></script>
@@ -64,13 +65,14 @@
 			});
 
 			$(document).ready(function(){
-				var id = document.getElementById("song_id").value;
+				var id = document.getElementById("song_id1").value;
 				console.log(id);
 				if (id) { //decide whether this is a fresh page now, or has been loaded with melody
 				//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 					console.log(id);
-					$('#melody_player').fadeIn(700, function() {
-						$('#chord_player_1').fadeIn(700);
+					$('#melody_player').fadeIn(400, function() {
+						$('#chord_player_1').fadeIn(400);
+						$('#chord_player_2').fadeIn(400);
   					});
 					setTimeout(function(){
 						console.log("here");
@@ -325,7 +327,7 @@
 								<h1 class="block_title">Original Melody</h1>
 							</div>
 							<div class="progress_bar" style="background:#9E9C9F;">
-								<div id="play-bar" class="progress_bar_fill" id="play-bar-chord1"></div>
+								<div id="play-bar" class="progress_bar_fill" ></div>
 							</div>
 
 
@@ -405,10 +407,67 @@
 
 
 							<form class="download_btn" method="get" action="download_chord" enctype="multipart/form-data">
-	    						<input type="hidden" id ="song_id" onchange="getChordFile()" name="song_id" value="{{id}}">
+	    						<input type="hidden" id ="song_id1" onchange="getChordFile()" name="song_id" value="{{id1}}">
 								<input type="hidden" id ="original_song_id" onchange="getChordFile()" name="o_id" value="{{o_id}}">
-								<input type="hidden" id ="song_pk" onchange="getChordFile()" name="o_id" value="{{pk}}">
+								<input type="hidden" id ="song_pk1" onchange="getChordFile()" name="o_id" value="{{pk1}}">
 								<input type="submit" value="Download" id="download_button" />
+							</form>
+						</div>
+
+						<div class="player_block" id="chord_player_2" style="display:none;">
+							<div class = "title_div">
+								<img class="icon" src="{% static 'assets/computer@2x.png' %}">
+								<h1 class="block_title">Chord Progression 1 </h1>
+							</div>
+							<!--
+							<p> {{song.original}} </p>
+							<p> {{song.fileWithChords}} </p>
+							<form name="form1" method="post" action="" enctype="multipart/form-data">
+	    						<input type="file" name="file1" onchange="loadFile1()" onclick="stop1()" />
+								{% csrf_token %}
+							</form>
+							-->
+
+							<!-- Lond song button -->
+							<button class="button" onclick="getChordFile()" style="display:none;" >Load Songs to player</button>
+							<p id="loading-chord2">Loading soundfont...</p>
+
+							<!-- Rolling chords -->
+							<div class="chords_display">
+								<p class="chords" id="generated_chords_2"></p>
+							</div>
+
+							<!-- Progress bar -->
+							<div class="progress_bar">
+								<div class="progress_bar_fill" id="play-bar-chord2"></div>
+							</div>
+
+							<!-- play & stop buttons -->
+							<div class="control_btns">
+								<button class="button music_btn play_btn" id="play-button-chord2" onclick="Player1.isPlaying() ? pause1() : play1();" disabled="disabled">
+									<img class="music_icon" src="{% static 'assets/pause.png' %}">
+								</button>
+								<button class="button music_btn stop_btn" onclick="stop1()">
+									<img class="music_icon" src="{% static 'assets/stop.png' %}">
+								</button>
+							</div>
+
+							<!-- Tempo and Download -->
+							<div class="tempo_div">
+								<p class = "tempo_text normal_text">
+									Tempo: <span id="tempo-display-chord2"></span> bpm<br />
+								</p>
+									<input class="tempo_slider" type="range" onchange="Player1.pause();Player1.setTempo(this.value);Player1.play()" min="50" max="200">
+								<p style="display:none">
+									MIDI File Format: <span id="file-format-display-chord2"></span>
+								</p>
+							</div>
+
+
+							<form class="download_btn" method="get" action="download_chord" enctype="multipart/form-data">
+								<input type="hidden" id ="song_id2" onchange="getChordFile()" name="song_id" value="{{id2}}">
+								<input type="hidden" id ="song_pk2" onchange="getChordFile()" name="o_id" value="{{pk2}}">
+								<input type="submit" value="Download" id="download_button2" />
 							</form>
 						</div>
 
