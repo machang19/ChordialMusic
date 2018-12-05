@@ -113,7 +113,7 @@ Soundfont.instrument(ac, 'https://raw.githubusercontent.com/gleitz/midi-js-sound
 
 	loadDataUri2 = function(dataUri) {
         var chord_list = []
-        var id = document.getElementById("song_pk").value;
+        var id = document.getElementById("song_pk2").value;
         console.log(id);
         var chord_list = []
         $.ajax({
@@ -175,7 +175,7 @@ Soundfont.instrument(ac, 'https://raw.githubusercontent.com/gleitz/midi-js-sound
 		document.getElementById('play-button-chord2').removeAttribute('disabled');
 
 		//buildTracksHtml();
-		play2();
+		//play2();
 	}
 
 

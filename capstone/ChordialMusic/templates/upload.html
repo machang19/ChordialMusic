@@ -267,15 +267,6 @@
 			.inputfile + label:hover {
 			    background-color: red;
 			}
-
-			#download_button {
-				font-weight: 500;
-				font-size: 16px;
-				margin-left: 10px;
-				color: white;
-				opacity: 0.6;
-			}
-
 			/* end of choose file button */
 
 		</style>
@@ -387,7 +378,7 @@
 							<!-- play & stop buttons -->
 							<div class="control_btns">
 								<button class="button music_btn play_btn" id="play-button-chord1" onclick="Player1.isPlaying() ? pause1() : play1();" disabled="disabled">
-									<img class="music_icon" src="{% static 'assets/pause.png' %}">
+									<img class="music_icon" src="{% static 'assets/play.png' %}">
 								</button>
 								<button class="button music_btn stop_btn" onclick="stop1()">
 									<img class="music_icon" src="{% static 'assets/stop.png' %}">
@@ -410,7 +401,7 @@
 	    						<input type="hidden" id ="song_id1" onchange="getChordFile()" name="song_id" value="{{id1}}">
 								<input type="hidden" id ="original_song_id" onchange="getChordFile()" name="o_id" value="{{o_id}}">
 								<input type="hidden" id ="song_pk1" onchange="getChordFile()" name="o_id" value="{{pk1}}">
-								<input type="submit" value="Download" id="download_button" />
+								<input type="submit" value="Download" style="font-weight: 500; font-size: 16px; margin-left: 10px; color: white; opacity: 0.6;" />
 							</form>
 						</div>
 
@@ -444,10 +435,10 @@
 
 							<!-- play & stop buttons -->
 							<div class="control_btns">
-								<button class="button music_btn play_btn" id="play-button-chord2" onclick="Player1.isPlaying() ? pause1() : play1();" disabled="disabled">
-									<img class="music_icon" src="{% static 'assets/pause.png' %}">
+								<button class="button music_btn play_btn" id="play-button-chord2" onclick="Player2.isPlaying() ? pause2() : play2();" disabled="disabled">
+									<img class="music_icon" src="{% static 'assets/play.png' %}">
 								</button>
-								<button class="button music_btn stop_btn" onclick="stop1()">
+								<button class="button music_btn stop_btn" onclick="stop2()">
 									<img class="music_icon" src="{% static 'assets/stop.png' %}">
 								</button>
 							</div>
@@ -457,7 +448,7 @@
 								<p class = "tempo_text normal_text">
 									Tempo: <span id="tempo-display-chord2"></span> bpm<br />
 								</p>
-									<input class="tempo_slider" type="range" onchange="Player1.pause();Player1.setTempo(this.value);Player1.play()" min="50" max="200">
+									<input class="tempo_slider" type="range" onchange="Player2.pause();Player2.setTempo(this.value);Player2.play()" min="50" max="200">
 								<p style="display:none">
 									MIDI File Format: <span id="file-format-display-chord2"></span>
 								</p>
@@ -467,7 +458,7 @@
 							<form class="download_btn" method="get" action="download_chord" enctype="multipart/form-data">
 								<input type="hidden" id ="song_id2" onchange="getChordFile()" name="song_id" value="{{id2}}">
 								<input type="hidden" id ="song_pk2" onchange="getChordFile()" name="o_id" value="{{pk2}}">
-								<input type="submit" value="Download" id="download_button2" />
+								<input type="submit" value="Download" style="font-weight: 500; font-size: 16px; margin-left: 10px; color: white; opacity: 0.6;" />
 							</form>
 						</div>
 
