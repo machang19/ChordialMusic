@@ -65,7 +65,7 @@ def predict(inp, numBars, key_fifth):
     res = []
     chords = []
     second = []
-    # print(list(inp))
+    print(inp.shape)
     pred = model.predict(inp)
     for x in range(0, numBars):
         argmax = np.argmax(pred[x], axis = 1)
@@ -107,8 +107,8 @@ def handle_uploaded_file(request):
     ml_arr,chords = predict(np.array(result), len(result), key_fifth)
     ml_arr2, chords2 = predict2(np.array(result), len(result), key_fifth)
     #ml_arr,chords = ([[1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0],[0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0],[1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0],[0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0]], ["A","A#", "A", "A#"])
-    f_name = output_to_midi(ml_arr, mid2, bar_length, channels, "chords1_" + f.name)
-    f_name2 = output_to_midi(ml_arr2, mid2, bar_length, channels, "chords2_" + f.name)
+    f_name = output_to_midi(ml_arr2, mid2, bar_length, channels, "chords1_" + f.name)
+    f_name2 = output_to_midi(ml_arr, mid2, bar_length, channels, "chords2_" + f.name)
     str_chords = ""
     for c in chords:
         str_chords += c + " "
@@ -282,6 +282,7 @@ def parse_midi_file(filepath):
     time = 0;
     curbarStart = 0;
 
+    carryover = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     for midi_note in all_notes:
         index = noteNumToindex(midi_note.note)
         time = midi_note.start
@@ -289,9 +290,26 @@ def parse_midi_file(filepath):
             curbarStart += bar_length
             temp = curbar
             result.append(temp)
-            curbar = [0,0,0,0,0,0,0,0,0,0,0,0]
-        curbar[(index + 5*key_fifth) % 12] += (midi_note.end - midi_note.start)
+            curbar = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            curbar = [min(x, bar_length) for x in carryover]
+            carryover = [max(0, x - bar_length) for x in carryover]
+        if i == 0 and midi_note.end >= (curbarStart + bar_length):
+            curbar[(index + 5*key_fifth) % 12] += (curbarStart + bar_length - midi_note.start)
+            carryover[(index + 5*key_fifth) % 12] += (midi_note.end - (curbarStart + bar_length))
+        else:
+            curbar[(index + 5*key_fifth) % 12] += (midi_note.end - max(midi_note.start, curbarStart))
     result.append(curbar)
+
+    # for midi_note in all_notes:
+    #     index = noteNumToindex(midi_note.note)
+    #     time = midi_note.start
+    #     while time >= (curbarStart + bar_length):
+    #         curbarStart += bar_length
+    #         temp = curbar
+    #         result.append(temp)
+    #         curbar = [0,0,0,0,0,0,0,0,0,0,0,0]
+    #     curbar[(index + 5*key_fifth) % 12] += (midi_note.end - midi_note.start)
+    # result.append(curbar)
     count = 0
     
     for x in result:
