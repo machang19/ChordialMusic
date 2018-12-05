@@ -116,6 +116,7 @@ def handle_uploaded_file(request):
     print (str_chords)
     model = ChordProgression(song_name = f.name, chords = str_chords)
     model.save()
+    str_chords = ""
     for c in chords2:
         str_chords += c + " "
     print (f.name)
