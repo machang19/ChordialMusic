@@ -5,3 +5,5 @@ from django.db import models
 class ChordProgression(models.Model):
     song_name = models.TextField(max_length=200)
     chords = models.TextField(max_length=600)
+    rating = models.IntegerField(default=0)
+    count = models.IntegerField(default=0)
