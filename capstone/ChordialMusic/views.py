@@ -247,9 +247,7 @@ def parse_midi_file(filepath):
     channels = set()
     stream1 = stream.Stream()
     bar_length = mid2.ticks_per_beat * numerator
-    print(mid2.ticks_per_beat)
-    print(numerator)
-    print(bar_length)
+
     for i, track in enumerate(mid2.tracks):
         print('Track {}: {}'.format(i, track.name))
         for msg in track:
@@ -257,6 +255,7 @@ def parse_midi_file(filepath):
             if (msg.type == 'time_signature'):
                 numerator = msg.numerator
                 denominator = msg.denominator
+                bar_length = mid2.ticks_per_beat * numerator * 4 / denominator
             elif (msg.type == 'note_on' and msg.velocity > 0):
                 channels.add(msg.channel)
                 open_notes.append(Note(msg.note,time, time))
@@ -264,7 +263,8 @@ def parse_midi_file(filepath):
                 for index in range(len(open_notes)):
                     midi_note = open_notes[index]
                     if(midi_note.note == msg.note):
-                            midi_end = ceil(time / (bar_length / 16)) * (bar_length / 16)
+                            ratio = numerator / denominator * 16
+                            midi_end = ceil(time / (bar_length / ratio )) * (bar_length / ratio)
                             midi_note.end = midi_end
                             all_notes.append(midi_note)
                             open_notes.pop(index)
@@ -274,7 +274,9 @@ def parse_midi_file(filepath):
                             note_to_insert.quarterLength = length
                             stream1.append(note_to_insert)
                             break
-
+    print(mid2.ticks_per_beat)
+    print(numerator)
+    print(bar_length)
     key_fifth = analysis.discrete.analyzeStream(stream1, 'Krumhansl').sharps
     print(key_fifth)
     result = []
@@ -284,6 +286,7 @@ def parse_midi_file(filepath):
 
     carryover = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     for midi_note in all_notes:
+        print(midi_note)
         index = noteNumToindex(midi_note.note)
         time = midi_note.start
         while time >= (curbarStart + bar_length):
@@ -316,12 +319,13 @@ def parse_midi_file(filepath):
         correctionFactor =  16/bar_length
         for i in range(len(x)):
             x[i] = x[i] * correctionFactor
-
-    print(result)
     window = 4
     fourbar_result = []
-    for i in range(0, len(result) - window + 1, 2):
-        fourbar_result.append(result[i:i+window])
+    if (len(result) <= 3):
+        fourbar_result = [result]
+    else:
+        for i in range(0, len(result) - window + 1, 2):
+            fourbar_result.append(result[i:i+window])
     return (fourbar_result,channels,mid2, bar_length, len(result), key_fifth)
 
 
