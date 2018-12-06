@@ -237,6 +237,17 @@ def get_chords(request):
     print(chords.chords)
     return HttpResponse(chords.chords)
 
+def update_rating(request):
+    id = request.GET["song_id"]
+    print(id)
+    chords = get_object_or_404(ChordProgression, id=id)
+    rating = request.Get["rating"]
+    chords.rating = (chords.rating * chords.count + rating)/(chords.count + 1)
+    chords.count += 1
+    chords.save()
+    print(chords.chords)
+    return HttpResponse(chords.chords)
+
 def parse_midi_file(filepath):
     mid2 = MidiFile(filepath)
     all_notes = []
