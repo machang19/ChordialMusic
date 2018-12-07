@@ -115,14 +115,21 @@ Soundfont.instrument(ac, 'https://raw.githubusercontent.com/gleitz/midi-js-sound
         var chord_list = []
         var id = document.getElementById("song_pk2").value;
         console.log(id);
-        var chord_list = []
+       var chord_list = []
+        var length = 0;
+        var bar_length = 0; 
         $.ajax({
             url: "/get_chords",
             data: "song_id=" + id,
             success: function(data) {
                 console.log(data)
                 chord_list = data.split(" ");
-                chord_list.splice(-1,1);
+                console.log(chord_list)
+                length = chord_list[chord_list.length-2];
+                bar_length = chord_list[chord_list.length-1];
+                console.log(length)
+                console.log(bar_length)
+                chord_list.splice(chord_list.length-2,2);
                 console.log(chord_list)
                 }
         });
@@ -140,9 +147,9 @@ Soundfont.instrument(ac, 'https://raw.githubusercontent.com/gleitz/midi-js-sound
 
 
             var num_display = 9;
-            var current_percentage = 100 - Player2.getSongPercentRemaining();
-            var interval = 100 / chord_list.length;
-            var current_index = Math.floor(current_percentage/interval);
+            var current_time = Player2.getSongTime() - Player2.getSongTimeRemaining();
+            var interval = 100 / length;
+            var current_index = Math.floor(current_time/(bar_length/1000));
             var start_index = 0
             var end_index = chord_list.length-1;
             var half_num = (num_display-1)/2

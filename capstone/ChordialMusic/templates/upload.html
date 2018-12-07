@@ -97,11 +97,11 @@
 					  function(){
 						var userRating = this.value;
 						alert(userRating);
-						var id = document.getElementById("song_pk1").value;
+						var id = document.getElementById("original_song_id").value;
 						console.log(id);
 						$.ajax({
 							url: "/update_rating",
-							data: "song_id=" + id +  "&rating=" + userRating
+							data: "model=" + 1 +  "&rating=" + userRating + "&song=" + id  
 						});
 
 					})
@@ -109,11 +109,11 @@
 					  function(){
 						var userRating = this.value;
 						alert(userRating);
-						var id = document.getElementById("song_pk2").value;
+						var id = document.getElementById("original_song_id").value;
 						console.log(id);
 						$.ajax({
 							url: "/update_rating",
-							data: "song_id=" + id + "&rating=" + userRating
+							data: "model=" + 2 +  "&rating=" + userRating + "&song=" + id 
 						});
 					})
 			});
@@ -401,6 +401,7 @@
 
 
     				<h4 style="margin-top: 80px; margin-bottom: 30px;">You can also connect a MIDI keyboard and start playing!</h4>
+    				<p id="timer"></p>
     				<div id="out">
 						<button class="button functional_button" onclick="startRecording()">
 							<p>Start Recording</p>
@@ -519,7 +520,7 @@
 						<div class="player_block" id="chord_player_2" style="display:none;">
 							<div class = "title_div">
 								<img class="icon" src="{% static 'assets/computer@2x.png' %}">
-								<h1 class="block_title">Chord Progression 1 </h1>
+								<h1 class="block_title">Chord Progression 2 </h1>
 							</div>
 							<!--
 							<p> {{song.original}} </p>

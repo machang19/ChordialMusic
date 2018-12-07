@@ -39,10 +39,13 @@ function printState() {
 start_time = 0;
 recording = false;
  end_time = 0;
-
+count = 0; 
 function startRecording(){
+    document.getElementById("timer").innerHTML = "0";
     recording = true;
 }
+
+var x; 
 function getMIDIMessage(message) {
     if (recording){
     var command = message.data[0];
@@ -52,11 +55,17 @@ function getMIDIMessage(message) {
     switch (command) {
         case 144: // noteOn
             console.log(message)
+            letters = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
+            noteIndex = ((note+3) % 12)
+            noteLetter = letters[noteIndex] 
+            document.getElementById("timer").innerHTML = noteLetter;
             if (first) {
                 start_time = message.timeStamp;
                 trk0.add(0, JZZ.MIDI.noteOn(0, note, velocity));
                 console.log(0)
                 first = false;
+                
+                    
 
             } else {
                 new_time = message.timeStamp;
@@ -78,6 +87,8 @@ function getMIDIMessage(message) {
 }
 
 function stopRecording() {
+    clearInterval(x);
+    document.getElementById("timer").innerHTML = "";
     ticks = end_time/(60000) * bpm * tpqn;
     console.log(ticks);
     trk0.add(ticks, JZZ.MIDI.smfEndOfTrack());
@@ -86,7 +97,7 @@ function stopRecording() {
     var uri = 'data:audio/midi;base64,' + b64; // data URI
 
 // Finally, write it to the document as a link and as an embedded object:
-    document.getElementById('out').innerHTML = 'New file: <a download=lame.mid href=' + uri + '>DOWNLOAD</a> <embed src=' + uri + ' autostart=false>';
+    document.getElementById('out').innerHTML = 'New file: <a download=demo.mid href=' + uri + '>DOWNLOAD</a> <embed src=' + uri + ' autostart=false>';
 
 
 

@@ -68,7 +68,6 @@ Soundfont.instrument(ac, 'https://raw.githubusercontent.com/gleitz/midi-js-sound
 					instrument.play(event.noteName, ac.currentTime, {gain:event.velocity/100});
 					//document.querySelector('#track-' + event.track + ' code').innerHTML = JSON.stringify(event);
 				}
-
 				document.getElementById('tempo-display-chord1').innerHTML = Player1.tempo;
 				document.getElementById('file-format-display-chord1').innerHTML = Player1.format;
 				document.getElementById('play-bar-chord1').style.width = 100 - Player1.getSongPercentRemaining() + '%';
@@ -90,13 +89,20 @@ Soundfont.instrument(ac, 'https://raw.githubusercontent.com/gleitz/midi-js-sound
         var id = document.getElementById("song_pk1").value;
         console.log(id);
         var chord_list = []
+        var length = 0;
+        var bar_length = 0; 
         $.ajax({
             url: "/get_chords",
             data: "song_id=" + id,
             success: function(data) {
                 console.log(data)
                 chord_list = data.split(" ");
-                chord_list.splice(-1,1);
+                console.log(chord_list)
+                length = chord_list[chord_list.length-2];
+                bar_length = chord_list[chord_list.length-1];
+                console.log(length)
+                console.log(bar_length)
+                chord_list.splice(chord_list.length-2,2);
                 console.log(chord_list)
                 }
         });
@@ -112,11 +118,14 @@ Soundfont.instrument(ac, 'https://raw.githubusercontent.com/gleitz/midi-js-sound
 			document.getElementById('file-format-display-chord1').innerHTML = Player1.format;
 			document.getElementById('play-bar-chord1').style.width = 100 - Player1.getSongPercentRemaining() + '%';
 
-            
+            console.log(length)
+
             var num_display = 9;
-            var current_percentage = 100 - Player1.getSongPercentRemaining();
-            var interval = 100 / chord_list.length;
-            var current_index = Math.floor(current_percentage/interval);
+            var current_time = Player1.getSongTime() - Player1.getSongTimeRemaining();
+            var interval = 100 / length;
+            var current_index = Math.floor(current_time/(bar_length/1000));
+            console.log(current_index);
+            console.log(current_time);
             var start_index = 0
             var end_index = chord_list.length-1; 
             var half_num = (num_display-1)/2

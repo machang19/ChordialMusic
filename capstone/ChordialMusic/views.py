@@ -103,25 +103,25 @@ def handle_uploaded_file(request):
         for chunk in f.chunks():
             destination.write(chunk)
 
-    (result, channels, mid2, bar_length, num_bars, key_fifth) = parse_midi_file(default_storage.path('tmp/'+f.name))
+    (result, channels, mid2, bar_length, num_bars, key_fifth, bar_mseconds) = parse_midi_file(default_storage.path('tmp/'+f.name))
     ml_arr,chords = predict(np.array(result), len(result), key_fifth)
     ml_arr2, chords2 = predict2(np.array(result), len(result), key_fifth)
     #ml_arr,chords = ([[1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0],[0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0],[1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0],[0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0]], ["A","A#", "A", "A#"])
-    f_name = output_to_midi(ml_arr2, mid2, bar_length, channels, "chords1_" + f.name)
-    f_name2 = output_to_midi(ml_arr, mid2, bar_length, channels, "chords2_" + f.name)
+    f_name = output_to_midi(ml_arr2, default_storage.path('tmp/'+f.name), bar_length, channels, "chords1_" + f.name)
+    f_name2 = output_to_midi(ml_arr, default_storage.path('tmp/'+f.name), bar_length, channels, "chords2_" + f.name)
     str_chords = ""
     for c in chords:
         str_chords += c + " "
     print (f.name)
     print (str_chords)
-    model = ChordProgression(song_name = f.name, chords = str_chords)
+    model = ChordProgression(song_name = f.name, chords = str_chords, length=num_bars, bar_length = bar_mseconds)
     model.save()
     str_chords = ""
     for c in chords2:
         str_chords += c + " "
     print (f.name)
     print (str_chords)
-    model2 = ChordProgression(song_name = f.name, chords = str_chords)
+    model2 = ChordProgression(song_name = f.name, chords = str_chords, length=num_bars, bar_length = bar_mseconds)
     model2.save()
     return render(request, 'upload.html', {"id1": f_name, "o_id": f.name, "pk1": model.pk, "id2": f_name2, "pk2": model2.pk})
 
@@ -172,8 +172,9 @@ def arr_to_chord(arr):
             result.append(57 + i)
     return result
 
-def output_to_midi(ml_arr, mid, barlength, channels, file_name):
+def output_to_midi(ml_arr, filepath, barlength, channels, file_name):
     channel = 0
+    mid = MidiFile(filepath)
     for i in range(15):
         if i not in channels:
             channel = i
@@ -237,18 +238,15 @@ def get_chords(request):
     print(id)
     chords = get_object_or_404(ChordProgression, id=id)
     print(chords.chords)
-    return HttpResponse(chords.chords)
+    return HttpResponse(chords.chords + str(chords.length) + " " + str(chords.bar_length))
 
 def update_rating(request):
-    id = request.GET["song_id"]
-    print(id)
-    chords = get_object_or_404(ChordProgression, id=id)
+    model = request.GET["model"]
+    name = request.GET["song"]
     rating = request.GET["rating"]
-    chords.rating = (chords.rating * chords.count + rating)/(chords.count + 1)
-    chords.count += 1
-    chords.save()
-    print(chords.chords)
-    return HttpResponse(chords.chords)
+    f = open(default_storage.path('tmp/'+ "ratings"), 'a')
+    f.write(model + "," + name + "," + rating + "\n")
+    return HttpResponse()
 
 def parse_midi_file(filepath):
     mid2 = MidiFile(filepath)
@@ -257,14 +255,17 @@ def parse_midi_file(filepath):
     open_notes = []
     numerator = 4
     denominator = 4
+    print(mid2.length)
     channels = set()
     stream1 = stream.Stream()
     bar_length = mid2.ticks_per_beat * numerator
-
+    tempo = 0
     for i, track in enumerate(mid2.tracks):
         print('Track {}: {}'.format(i, track.name))
         for msg in track:
             time += msg.time
+            if (msg.type == 'set_tempo'):
+                tempo = msg.tempo 
             if (msg.type == 'time_signature'):
                 numerator = msg.numerator
                 denominator = msg.denominator
@@ -332,6 +333,7 @@ def parse_midi_file(filepath):
         correctionFactor =  16/bar_length
         for i in range(len(x)):
             x[i] = x[i] * correctionFactor
+        print(x)
     window = 4
     fourbar_result = []
     if (len(result) <= 3):
@@ -339,7 +341,8 @@ def parse_midi_file(filepath):
     else:
         for i in range(0, len(result) - window + 1, 2):
             fourbar_result.append(result[i:i+window])
-    return (fourbar_result,channels,mid2, int(bar_length), len(result), key_fifth)
+    bar_mseconds = 1000 * mido.tick2second(int(bar_length), mid2.ticks_per_beat, tempo)
+    return (fourbar_result,channels,mid2, int(bar_length), len(result), key_fifth, bar_mseconds)
 
 
 def parse_midi_file_with_chords(filepath):
@@ -353,10 +356,12 @@ def parse_midi_file_with_chords(filepath):
     track1Result = []
     track2Result = []
     stream1 = stream.Stream()
+    print(mid.length)
     bar_length = mid2.ticks_per_beat * numerator
     for i, track in enumerate(mid2.tracks):
         print('Track {}: {}'.format(i, track.name))
         for msg in track:
+            print(msg)
             time += msg.time
             if (msg.type == 'time_signature'):
                 numerator = msg.numerator
