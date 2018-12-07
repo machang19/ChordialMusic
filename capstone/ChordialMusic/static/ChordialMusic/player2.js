@@ -4,13 +4,9 @@ var AudioContext = window.AudioContext || window.webkitAudioContext || false;
 var ac = new AudioContext || new webkitAudioContext;
 var eventsDiv = document.getElementById('events');
 var bar_length = 0;
-var o_tempo = 0;
 
 
 var changeTempo1 = function(tempo) {
-    if (o_tempo == 0){
-        o_tempo = Player1.tempo;
-    }
     bar_length = (Player1.tempo/ tempo ) * bar_length;
 	Player1.tempo = tempo;
 }
@@ -160,10 +156,6 @@ Soundfont.instrument(ac, 'https://raw.githubusercontent.com/gleitz/midi-js-sound
 		});
 		console.log(dataUri);
 		Player1.loadDataUri(dataUri);
-		if (o_tempo != 0){
-            bar_length = (o_tempo/Player1.tempo) * bar_length
-        }
-
 		document.getElementById('play-button-chord1').removeAttribute('disabled');
 
 		//buildTracksHtml();
