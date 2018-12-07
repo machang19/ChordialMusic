@@ -7,7 +7,9 @@ var bar_length = 0;
 
 
 var changeTempo1 = function(tempo) {
+    console.log(bar_length)
     bar_length = (Player1.tempo/ tempo ) * bar_length;
+    console.log(bar_length)
 	Player1.tempo = tempo;
 }
 

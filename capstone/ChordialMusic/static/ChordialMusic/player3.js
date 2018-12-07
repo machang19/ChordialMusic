@@ -6,7 +6,8 @@ var eventsDiv = document.getElementById('events');
 var bar_length = 0;
 
 var changeTempo2 = function(tempo) {
-    bar_length = (Player2.tempo/ temp ) * bar_length;
+    bar_length = (Player2.tempo/ tempo ) * bar_length;
+    console.log(bar_length);
 	Player2.tempo = tempo;
 }
 

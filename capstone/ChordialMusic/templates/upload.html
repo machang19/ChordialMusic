@@ -417,6 +417,8 @@
     				<h4 style="margin-top: 80px; margin-bottom: 30px;">You can also connect a MIDI keyboard and start playing!</h4>
     				<h7 id="timer"></h7>
     				<div id="out">
+    					<input type="number" id="tempo" name="tempo"
+       					min="60" max="150" value="90">
 						<button class="button functional_button" onclick="startRecording()">
 							<p>Start Recording</p>
 						</button>
@@ -509,7 +511,7 @@
 									<p class = "tempo_text normal_text">
 										Tempo: <span id="tempo-display-chord1"></span> bpm<br />
 									</p>
-										<input class="tempo_slider" type="range" onchange="Player1.pause();Player1.setTempo(this.value);Player1.play()" min="50" max="200">
+										<input class="tempo_slider" type="range" onchange="Player1.pause();changeTempo1(this.value);Player1.play()" min="50" max="200">
 									<p style="display:none">
 										MIDI File Format: <span id="file-format-display-chord1"></span>
 									</p>
@@ -582,7 +584,7 @@
 									<p class = "tempo_text normal_text">
 										Tempo: <span id="tempo-display-chord2"></span> bpm<br />
 									</p>
-										<input class="tempo_slider" type="range" onchange="Player2.pause();Player2.setTempo(this.value);Player2.play()" min="50" max="200">
+										<input class="tempo_slider" type="range" onchange="Player2.pause();changeTempo2(this.value);Player2.play();" min="50" max="200">
 									<p style="display:none">
 										MIDI File Format: <span id="file-format-display-chord2"></span>
 									</p>
