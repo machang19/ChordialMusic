@@ -3,9 +3,11 @@ var loadFile1, loadDataUri1, Player1;
 var AudioContext = window.AudioContext || window.webkitAudioContext || false;
 var ac = new AudioContext || new webkitAudioContext;
 var eventsDiv = document.getElementById('events');
+var bar_length = 0;
 
 
 var changeTempo1 = function(tempo) {
+    bar_length = (Player1.tempo/ tempo ) * bar_length;
 	Player1.tempo = tempo;
 }
 
@@ -90,7 +92,6 @@ Soundfont.instrument(ac, 'https://raw.githubusercontent.com/gleitz/midi-js-sound
         console.log(id);
         var chord_list = []
         var length = 0;
-        var bar_length = 0; 
         $.ajax({
             url: "/get_chords",
             data: "song_id=" + id,
