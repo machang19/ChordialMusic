@@ -206,9 +206,13 @@
 
 			#rating2 {
 				float:left;
-				width:300px;
+				width:280;
 			}
-			#rating2 span { float:right; position:relative; }
+			#rating2 span { 
+				float:right; 
+				position:relative; 
+				margin-left: 10px;
+			}
 			#rating2 span input {
 				position:absolute;
 				top:0px;
@@ -221,7 +225,7 @@
 				height:30px;
 				text-align:center;
 				color:#FFF;
-				background:#ccc;
+				background:#8CBBC8;
 				font-size:30px;
 				margin-right:2px;
 				line-height:30px;
@@ -238,9 +242,13 @@
 
 			#rating1 {
 				float:left;
-				width:300px;
+				width:280;
 			}
-			#rating1 span { float:right; position:relative; }
+			#rating1 span { 
+				float:right; 
+				position:relative; 
+				margin-left: 10px;
+			}
 			#rating1 span input {
 				position:absolute;
 				top:0px;
@@ -253,7 +261,7 @@
 				height:30px;
 				text-align:center;
 				color:#FFF;
-				background:#ccc;
+				background:#8CBBC8;
 				font-size:30px;
 				margin-right:2px;
 				line-height:30px;
@@ -479,14 +487,6 @@
 								<div class="progress_bar_fill" id="play-bar-chord1"></div>
 							</div>
 
-							<div class="rating" id = "rating1">
-								<span><input type="radio" name="rating" id="str5" value="5"><label for="str5"></label></span>
-								<span><input type="radio" name="rating" id="str4" value="4"><label for="str4"></label></span>
-								<span><input type="radio" name="rating" id="str3" value="3"><label for="str3"></label></span>
-								<span><input type="radio" name="rating" id="str2" value="2"><label for="str2"></label></span>
-								<span><input type="radio" name="rating" id="str1" value="1"><label for="str1"></label></span>
-							</div>
-
 							<!-- play & stop buttons -->
 							<div class="control_btns">
 								<button class="button music_btn play_btn" id="play-button-chord1" onclick="Player1.isPlaying() ? pause1() : play1();" disabled="disabled">
@@ -498,24 +498,39 @@
 							</div>
 
 							<!-- Tempo and Download -->
-							<div class="tempo_div">
-								<p class = "tempo_text normal_text">
-									Tempo: <span id="tempo-display-chord1"></span> bpm<br />
-								</p>
-									<input class="tempo_slider" type="range" onchange="Player1.pause();Player1.setTempo(this.value);Player1.play()" min="50" max="200">
-								<p style="display:none">
-									MIDI File Format: <span id="file-format-display-chord1"></span>
-								</p>
+							<div style="height:80px;">
+								<div class="tempo_div">
+									<p class = "tempo_text normal_text">
+										Tempo: <span id="tempo-display-chord1"></span> bpm<br />
+									</p>
+										<input class="tempo_slider" type="range" onchange="Player1.pause();Player1.setTempo(this.value);Player1.play()" min="50" max="200">
+									<p style="display:none">
+										MIDI File Format: <span id="file-format-display-chord1"></span>
+									</p>
+								</div>
+
+
+								<form class="download_btn" method="get" action="download_chord" enctype="multipart/form-data">
+		    						<input type="hidden" id ="song_id1" onchange="getChordFile()" name="song_id" value="{{id1}}">
+									<input type="hidden" id ="original_song_id" onchange="getChordFile()" name="o_id" value="{{o_id}}">
+									<input type="hidden" id ="song_pk1" onchange="getChordFile()" name="o_id" value="{{pk1}}">
+									<input type="submit" value="Download" style="font-weight: 500; font-size: 16px; margin-left: 10px; color: white; opacity: 0.6;" />
+								</form>
 							</div>
 
+							<!-- Rating -->
+	                        <div class="rating" id = "rating1">
+	                            <span><input type="radio" name="rating" id="str5" value="5"><label for="str5"></label></span>
+	                            <span><input type="radio" name="rating" id="str4" value="4"><label for="str4"></label></span>
+	                            <span><input type="radio" name="rating" id="str3" value="3"><label for="str3"></label></span>
+	                            <span><input type="radio" name="rating" id="str2" value="2"><label for="str2"></label></span>
+	                            <span><input type="radio" name="rating" id="str1" value="1"><label for="str1"></label></span>
+	                            <p class="normal_text">Rating:</p>
+	                        </div>
 
-							<form class="download_btn" method="get" action="download_chord" enctype="multipart/form-data">
-	    						<input type="hidden" id ="song_id1" onchange="getChordFile()" name="song_id" value="{{id1}}">
-								<input type="hidden" id ="original_song_id" onchange="getChordFile()" name="o_id" value="{{o_id}}">
-								<input type="hidden" id ="song_pk1" onchange="getChordFile()" name="o_id" value="{{pk1}}">
-								<input type="submit" value="Download" style="font-weight: 500; font-size: 16px; margin-left: 10px; color: white; opacity: 0.6;" />
-							</form>
+
 						</div>
+
 
 						<div class="player_block" id="chord_player_2" style="display:none;">
 							<div class = "title_div">
@@ -545,13 +560,6 @@
 								<div class="progress_bar_fill" id="play-bar-chord2"></div>
 							</div>
 
-							<div class="rating" id ="rating2">
-								<span><input type="radio" name="rating" id="2str5" value="5"><label for="2str5"></label></span>
-								<span><input type="radio" name="rating" id="2str4" value="4"><label for="2str4"></label></span>
-								<span><input type="radio" name="rating" id="2str3" value="3"><label for="2str3"></label></span>
-								<span><input type="radio" name="rating" id="2str2" value="2"><label for="2str2"></label></span>
-								<span><input type="radio" name="rating" id="2str1" value="1"><label for="2str1"></label></span>
-							</div>
 							<!-- play & stop buttons -->
 							<div class="control_btns">
 								<button class="button music_btn play_btn" id="play-button-chord2" onclick="Player2.isPlaying() ? pause2() : play2();" disabled="disabled">
@@ -563,22 +571,35 @@
 							</div>
 
 							<!-- Tempo and Download -->
-							<div class="tempo_div">
-								<p class = "tempo_text normal_text">
-									Tempo: <span id="tempo-display-chord2"></span> bpm<br />
-								</p>
-									<input class="tempo_slider" type="range" onchange="Player2.pause();Player2.setTempo(this.value);Player2.play()" min="50" max="200">
-								<p style="display:none">
-									MIDI File Format: <span id="file-format-display-chord2"></span>
-								</p>
+							<div style = "height:80px;">
+								<div class="tempo_div">
+									<p class = "tempo_text normal_text">
+										Tempo: <span id="tempo-display-chord2"></span> bpm<br />
+									</p>
+										<input class="tempo_slider" type="range" onchange="Player2.pause();Player2.setTempo(this.value);Player2.play()" min="50" max="200">
+									<p style="display:none">
+										MIDI File Format: <span id="file-format-display-chord2"></span>
+									</p>
+								</div>
+
+
+								<form class="download_btn" method="get" action="download_chord" enctype="multipart/form-data">
+									<input type="hidden" id ="song_id2" onchange="getChordFile()" name="song_id" value="{{id2}}">
+									<input type="hidden" id ="song_pk2" onchange="getChordFile()" name="o_id" value="{{pk2}}">
+									<input type="submit" value="Download" style="font-weight: 500; font-size: 16px; margin-left: 10px; color: white; opacity: 0.6;" />
+								</form>
 							</div>
 
+							<!-- Rating -->
+                            <div class="rating" id ="rating2">
+                                <span><input type="radio" name="rating" id="2str5" value="5"><label for="2str5"></label></span>
+                                <span><input type="radio" name="rating" id="2str4" value="4"><label for="2str4"></label></span>
+                                <span><input type="radio" name="rating" id="2str3" value="3"><label for="2str3"></label></span>
+                                <span><input type="radio" name="rating" id="2str2" value="2"><label for="2str2"></label></span>
+                                <span><input type="radio" name="rating" id="2str1" value="1"><label for="2str1"></label></span>
+                                <p class="normal_text">Rating:</p>
+                            </div>
 
-							<form class="download_btn" method="get" action="download_chord" enctype="multipart/form-data">
-								<input type="hidden" id ="song_id2" onchange="getChordFile()" name="song_id" value="{{id2}}">
-								<input type="hidden" id ="song_pk2" onchange="getChordFile()" name="o_id" value="{{pk2}}">
-								<input type="submit" value="Download" style="font-weight: 500; font-size: 16px; margin-left: 10px; color: white; opacity: 0.6;" />
-							</form>
 						</div>
 
 
