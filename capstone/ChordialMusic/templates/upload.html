@@ -97,11 +97,11 @@
 					  function(){
 						var userRating = this.value;
 						alert(userRating);
-						var id = document.getElementById("song_id1").value;
+						var id = document.getElementById("song_pk1").value;
 						console.log(id);
 						$.ajax({
 							url: "/update_rating",
-							data: "song_id=" + id, "rating=" + userRating
+							data: "song_id=" + id +  "&rating=" + userRating
 						});
 
 					})
@@ -109,11 +109,11 @@
 					  function(){
 						var userRating = this.value;
 						alert(userRating);
-						var id = document.getElementById("song_id2").value;
+						var id = document.getElementById("song_pk2").value;
 						console.log(id);
 						$.ajax({
 							url: "/update_rating",
-							data: "song_id=" + id, "rating=" + userRating
+							data: "song_id=" + id + "&rating=" + userRating
 						});
 					})
 			});

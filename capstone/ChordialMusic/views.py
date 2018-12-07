@@ -215,6 +215,7 @@ def output_to_midi(ml_arr, mid, barlength, channels, file_name):
                     msgs_to_add[0].time = barlength
                 for m in msgs_to_add:
                     track.append(m)
+                
                 msg.time = time - nextBarStart
                 nextBarStart += barlength
             track.append(msg)
@@ -225,6 +226,7 @@ def output_to_midi(ml_arr, mid, barlength, channels, file_name):
         for note in arr_to_chord(ml_arr[-1]):
             track.append(Message('note_off', channel=channel, note=note, time=0))
         track.append(m)
+       
 
     output_file.save(default_storage.path('tmp/'+file_name))
     file_full_path = default_storage.path('tmp/'+file_name)
@@ -241,7 +243,7 @@ def update_rating(request):
     id = request.GET["song_id"]
     print(id)
     chords = get_object_or_404(ChordProgression, id=id)
-    rating = request.Get["rating"]
+    rating = request.GET["rating"]
     chords.rating = (chords.rating * chords.count + rating)/(chords.count + 1)
     chords.count += 1
     chords.save()
@@ -337,7 +339,7 @@ def parse_midi_file(filepath):
     else:
         for i in range(0, len(result) - window + 1, 2):
             fourbar_result.append(result[i:i+window])
-    return (fourbar_result,channels,mid2, bar_length, len(result), key_fifth)
+    return (fourbar_result,channels,mid2, int(bar_length), len(result), key_fifth)
 
 
 def parse_midi_file_with_chords(filepath):
